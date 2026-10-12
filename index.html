@@ -1,0 +1,3369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PawSocial India — The Social Network for Indian Pet Lovers</title>
+  <meta name="description" content="India's dedicated pet network. Connect with fellow pet parents, celebrate Desi Indie dogs and cats, discover verified Indian veterinarians and groomers in Mumbai, Pune, Bengaluru and Delhi.">
+  
+  <!-- Modern Sans Typography: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              200: '#fed7aa',
+              300: '#fdba74',
+              400: '#fb923c',
+              500: '#f97316', // Vibrant Warm Coral/Orange Primary
+              600: '#ea580c', // Hover Accent
+              700: '#c2410c',
+              800: '#9a3412',
+              900: '#7c2d12',
+            },
+            primary: '#f97316',
+            primaryHover: '#ea580c',
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          },
+          boxShadow: {
+            'soft': '0 2px 15px -3px rgba(15, 23, 42, 0.04), 0 4px 6px -4px rgba(15, 23, 42, 0.02)',
+            'card': '0 10px 25px -4px rgba(15, 23, 42, 0.05), 0 4px 6px -2px rgba(15, 23, 42, 0.03)',
+            'card-hover': '0 20px 35px -4px rgba(249, 115, 22, 0.12), 0 8px 10px -4px rgba(15, 23, 42, 0.04)',
+            'floating': '0 25px 50px -12px rgba(15, 23, 42, 0.25)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- React 18, ReactDOM & Babel -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    * {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      -webkit-font-smoothing: antialiased;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    @keyframes heartPop {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.35); }
+      60% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+    .animate-heart-pop {
+      animation: heartPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(14px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .animate-slide-up {
+      animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.18s ease-out forwards;
+    }
+    .glass-header {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-orange-100 selection:text-orange-700 min-h-screen flex flex-col">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // ==========================================
+    // INITIAL REALISTIC INDIAN PET DATA
+    // ==========================================
+    const initialPets = [
+      {
+        id: 1,
+        name: "Sheru",
+        species: "Dog",
+        breed: "Indian Pariah (Indie)",
+        age: "2.5 yrs",
+        gender: "Male",
+        weight: "19 kg",
+        owner: "Ranjana Chavan",
+        location: "Koregaon Park, Pune",
+        distance: "0.3 km away",
+        avatar: "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=400&q=80",
+        coverImage: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80",
+        bio: "Rescued near FC Road Pune! 🐕 King of morning sprints at ARAI Hills. Loves boiled chicken, curd rice, and afternoon nap sessions.",
+        followers: 1840,
+        following: 320,
+        isFollowed: true,
+        badges: ["Indie Pride 🇮🇳", "Fully Vaccinated", "Agile Runner"],
+        favoriteTreats: "Boiled chicken liver & peanut butter rotis",
+        vetClinic: "Crown Vet Multi-Speciality Clinic, Pune"
+      },
+      {
+        id: 2,
+        name: "Meenu",
+        species: "Cat",
+        breed: "Rescued Persian Mix",
+        age: "3 yrs",
+        gender: "Female",
+        weight: "4.2 kg",
+        owner: "Ranjana Chavan",
+        location: "Koregaon Park, Pune",
+        distance: "0.3 km away",
+        avatar: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=400&q=80",
+        coverImage: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=800&q=80",
+        bio: "Balcony sunbeam empress. Loves inspecting potted plants, chasing peacock feathers, and judged stares. 🐾",
+        followers: 1120,
+        following: 180,
+        isFollowed: true,
+        badges: ["Indoor Only", "Royal Purrs", "Dewormed"],
+        favoriteTreats: "Steamed surmai fish & creamy lickable treats",
+        vetClinic: "The Cat Wellness Clinic, Pune"
+      },
+      {
+        id: 3,
+        name: "Bruno",
+        species: "Dog",
+        breed: "Golden Retriever",
+        age: "2 yrs",
+        gender: "Male",
+        weight: "31 kg",
+        owner: "Rohan Kulkarni",
+        location: "Bandra West, Mumbai",
+        distance: "1.8 km away",
+        avatar: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=400&q=80",
+        coverImage: "https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?auto=format&fit=crop&w=800&q=80",
+        bio: "Professional coconut retriever at Carter Road! Friend to every child and stray dog on the promenade.",
+        followers: 3210,
+        following: 490,
+        isFollowed: false,
+        badges: ["Beach Swimmer", "Friendly", "Therapy Certified"],
+        favoriteTreats: "Himalayan Yak cheese churpi chews",
+        vetClinic: "Crown Vet Mahalaxmi, Mumbai"
+      },
+      {
+        id: 4,
+        name: "Kulfi",
+        species: "Dog",
+        breed: "Indie Foster Pup",
+        age: "7 months",
+        gender: "Female",
+        weight: "11 kg",
+        owner: "Priya Sharma",
+        location: "Indiranagar, Bengaluru",
+        distance: "2.5 km away",
+        avatar: "https://images.unsplash.com/photo-1589965716319-4a041b58fa8a?auto=format&fit=crop&w=400&q=80",
+        coverImage: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=800&q=80",
+        bio: "Rescued from a storm drain during Bengaluru monsoon. Now thriving and learning basic commands at Cubbon Park! 🌸",
+        followers: 940,
+        following: 150,
+        isFollowed: false,
+        badges: ["Adopted Hero", "Gentle", "Puppy Star"],
+        favoriteTreats: "Sweet potato chips & puppy biscuits",
+        vetClinic: "Cessna Lifeline Vet Hospital, Bengaluru"
+      },
+      {
+        id: 5,
+        name: "Mithoo",
+        species: "Rabbit",
+        breed: "Holland Lop",
+        age: "1.5 yrs",
+        gender: "Male",
+        weight: "1.8 kg",
+        owner: "Ananya Deshmukh",
+        location: "Kothrud, Pune",
+        distance: "3.2 km away",
+        avatar: "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=400&q=80",
+        coverImage: "https://images.unsplash.com/photo-1518796745738-41048802f99a?auto=format&fit=crop&w=800&q=80",
+        bio: "Living room champion! Does binkies whenever fresh coriander or organic methi leaves arrive from Mandai. 🌿",
+        followers: 820,
+        following: 110,
+        isFollowed: false,
+        badges: ["Free Roam", "Potty Trained", "Herbivore"],
+        favoriteTreats: "Fresh coriander sprigs & apple slices",
+        vetClinic: "East Pune Exotic & Avian Care"
+      },
+      {
+        id: 6,
+        name: "Rocky",
+        species: "Dog",
+        breed: "Labrador Retriever",
+        age: "3 yrs",
+        gender: "Male",
+        weight: "34 kg",
+        owner: "Amit Verma",
+        location: "Cyber City, Gurugram",
+        distance: "4.1 km away",
+        avatar: "https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=400&q=80",
+        coverImage: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=800&q=80",
+        bio: "Food detector 3000! Loves swimming at dog parks and gentle morning jogs around Aravalli trails.",
+        followers: 2450,
+        following: 380,
+        isFollowed: false,
+        badges: ["Swimmer", "Obedient", "Gentle Giant"],
+        favoriteTreats: "Fresh paneer cubes & boiled eggs",
+        vetClinic: "DCC Animal Hospital, Delhi NCR"
+      }
+    ];
+
+    const initialPosts = [
+      {
+        id: 101,
+        petId: 1,
+        author: "Sheru & Ranjana",
+        petName: "Sheru",
+        species: "Dog",
+        avatar: "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=400&q=80",
+        owner: "Ranjana Chavan",
+        time: "20m ago",
+        content: "Sunrise pack walk at ARAI Hills Pune! 🌄 Sheru made 3 new doggie friends and we celebrated with boiled chicken and fresh curd afterward. Nothing matches the resilience and unconditional love of our Desi Indie dogs! Proud pet mama moment. 🐾❤️🇮🇳",
+        image: "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=800&q=80",
+        tag: "#IndiePride",
+        category: "Adventures",
+        likes: 194,
+        isLiked: true,
+        comments: [
+          { id: 1, author: "Rohan & Bruno", avatar: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=150&q=80", text: "Sheru is looking so majestic Ranjanaji! We should arrange a Pune-Mumbai pack meetup soon! 🐕", time: "15m ago" },
+          { id: 2, author: "Dr. Radhika Sen", avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=150&q=80", text: "Look at that shiny Indie coat! Curd and turmeric chicken work wonders in our climate.", time: "8m ago" }
+        ]
+      },
+      {
+        id: 102,
+        petId: 3,
+        author: "Bruno the Golden",
+        petName: "Bruno",
+        species: "Dog",
+        avatar: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=400&q=80",
+        owner: "Rohan Kulkarni",
+        time: "1h ago",
+        content: "Carter Road Bandra morning session! Found a tender coconut on the beach and insisted on carrying it all the way home. The Mumbai sea breeze and wagging tails = best Sunday therapy! 🌊🥥🐕",
+        image: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=800&q=80",
+        tag: "#MumbaiDogs",
+        category: "Moments",
+        likes: 165,
+        isLiked: false,
+        comments: [
+          { id: 3, author: "Ranjana & Sheru", avatar: "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80", text: "Haha Bruno's classic coconut fetch! Pure retriever happiness! ❤️", time: "45m ago" }
+        ]
+      },
+      {
+        id: 103,
+        petId: 2,
+        author: "Meenu & Ranjana",
+        petName: "Meenu",
+        species: "Cat",
+        avatar: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=400&q=80",
+        owner: "Ranjana Chavan",
+        time: "3h ago",
+        content: "Pune monsoon cleared up for a warm sunny afternoon. Meenu immediately captured her favorite balcony chair. No disturbance allowed unless offering steamed surmai fish broth! 🐾☀️",
+        image: "https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?auto=format&fit=crop&w=800&q=80",
+        tag: "#CatsofIndia",
+        category: "Moments",
+        likes: 230,
+        isLiked: false,
+        comments: [
+          { id: 4, author: "Ananya Deshmukh", avatar: "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=150&q=80", text: "Queen of Koregaon Park! That gaze is so regal. ✨", time: "2h ago" }
+        ]
+      },
+      {
+        id: 104,
+        petId: 4,
+        author: "Kulfi Pup",
+        petName: "Kulfi",
+        species: "Dog",
+        avatar: "https://images.unsplash.com/photo-1589965716319-4a041b58fa8a?auto=format&fit=crop&w=400&q=80",
+        owner: "Priya Sharma",
+        time: "5h ago",
+        content: "Cubbon Park Sunday adoption drive in Bengaluru! Helped socialize 4 shelter puppies. Kulfi was the star mentor showing them how to sit and take treats gently. #AdoptDontShop 🐾❤️",
+        image: "https://images.unsplash.com/photo-1589965716319-4a041b58fa8a?auto=format&fit=crop&w=800&q=80",
+        tag: "#AdoptDontShop",
+        category: "Community",
+        likes: 185,
+        isLiked: false,
+        comments: []
+      }
+    ];
+
+    const initialServices = [
+      {
+        id: 1,
+        name: "Crown Vet Multi-Speciality Animal Hospital",
+        type: "Veterinarian",
+        category: "Veterinarians",
+        icon: "stethoscope",
+        rating: 4.9,
+        reviewsCount: 420,
+        address: "Lane 7, Koregaon Park, Pune & Mahalaxmi, Mumbai",
+        distance: "1.2 km",
+        priceTier: "₹₹",
+        consultFee: "₹800",
+        features: ["24/7 Emergency & ICU", "Digital X-Ray & Ultrasound", "Advanced Surgery", "In-House Pharmacy"],
+        image: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=600&q=80",
+        phone: "+91 98220 12345",
+        hours: "Open 24 Hours (Emergency Active)",
+        bio: "Premier veterinary healthcare facility in Maharashtra with international medical standards, compassionate ICU doctors, and sterile surgical suites."
+      },
+      {
+        id: 2,
+        name: "Cessna Lifeline Veterinary Hospital",
+        type: "Veterinarian",
+        category: "Veterinarians",
+        icon: "stethoscope",
+        rating: 4.8,
+        reviewsCount: 380,
+        address: "100 Ft Road, Indiranagar, Bengaluru",
+        distance: "2.8 km",
+        priceTier: "₹₹₹",
+        consultFee: "₹1,000",
+        features: ["Emergency Care", "Orthopedic Surgery", "Canine Blood Bank", "Diagnostic CT Scan"],
+        image: "https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=600&q=80",
+        phone: "+91 80 4153 1122",
+        hours: "Open 24/7",
+        bio: "Renowned multispeciality hospital with round-the-clock emergency triage, oncology specialists, and comprehensive diagnostics."
+      },
+      {
+        id: 3,
+        name: "Flying Paws Ayurvedic Pet Spa & Grooming",
+        type: "Grooming",
+        category: "Grooming",
+        icon: "scissors",
+        rating: 4.9,
+        reviewsCount: 260,
+        address: "Koregaon Park South Main Road, Pune",
+        distance: "0.8 km",
+        priceTier: "₹₹",
+        consultFee: "₹1,200",
+        features: ["Neem & Herbal Tick Baths", "De-shedding Treatment", "Nail Dremel", "Aromatherapy"],
+        image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=600&q=80",
+        phone: "+91 98231 99880",
+        hours: "9:00 AM – 7:30 PM",
+        bio: "Holistic, stress-free grooming using certified natural Indian botanical extracts, soothing neem washes, and breed-specific styling."
+      },
+      {
+        id: 4,
+        name: "Wagsville Resort, Daycare & Splash Pool",
+        type: "Boarding",
+        category: "Boarding",
+        icon: "home",
+        rating: 4.9,
+        reviewsCount: 310,
+        address: "Old Mumbai-Pune Highway, Talegaon / Lonavala Outskirts",
+        distance: "15 km",
+        priceTier: "₹₹₹",
+        consultFee: "₹1,500/night",
+        features: ["Cage-Free Luxury Suites", "Canine Swimming Pool", "CCTV Webcams", "Veterinarian on Call"],
+        image: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=600&q=80",
+        phone: "+91 98900 44552",
+        hours: "Check-in: 8:00 AM – 8:00 PM",
+        bio: "Eco-friendly resort surrounded by nature where pets enjoy freedom, splash pool swimming sessions, and home-cooked fresh meals."
+      },
+      {
+        id: 5,
+        name: "Pawsitive Minds Canine Behavior Academy",
+        type: "Training",
+        category: "Training",
+        icon: "award",
+        rating: 4.9,
+        reviewsCount: 195,
+        address: "Pali Hill, Bandra West, Mumbai",
+        distance: "2.1 km",
+        priceTier: "₹₹",
+        consultFee: "₹1,500",
+        features: ["Force-Free Positive Methods", "Indie Street-Dog Rehab", "Puppy Kindergarten", "Home Consults"],
+        image: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=600&q=80",
+        phone: "+91 98201 77665",
+        hours: "8:00 AM – 7:00 PM",
+        bio: "Certified canine behaviorists specializing in positive reinforcement, helping Indian families build lifelong bonds with their dogs."
+      },
+      {
+        id: 6,
+        name: "Blue Cross & RESQ Charitable Animal Care",
+        type: "Veterinarian",
+        category: "Veterinarians",
+        icon: "stethoscope",
+        rating: 4.8,
+        reviewsCount: 540,
+        address: "Bavadhan / Warje, Pune",
+        distance: "6.0 km",
+        priceTier: "₹",
+        consultFee: "Subsidized / Free for Rescues",
+        features: ["Stray Rescue Triage", "Free Ambulance Service", "Rabies Vaccination Drives", "Wildlife Rehab"],
+        image: "https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=600&q=80",
+        phone: "+91 98909 99111",
+        hours: "24/7 Rescue Emergency Helpline",
+        bio: "Maharashtra's leading wildlife & domestic animal rescue organization providing emergency treatment and rehabilitation for street animals."
+      }
+    ];
+
+    const initialGroups = [
+      {
+        id: 1,
+        name: "Indie Dog Parents & Desi Rescue Tribe",
+        category: "Indie & Desi Pride",
+        members: 5840,
+        postsToday: 32,
+        description: "India's biggest community celebrating Desi Indie dogs! Share adoption stories, nutrition hacks, and pack meetups.",
+        image: "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=400&q=80",
+        isJoined: true,
+        tag: "#DesiDogLove"
+      },
+      {
+        id: 2,
+        name: "Pune & Mumbai Pet Guardians Club",
+        category: "Local Meetups",
+        members: 4210,
+        postsToday: 24,
+        description: "Coordinating weekend pack walks at ARAI Hills, Shivaji Park, Juhu Beach, and Koregaon Park dog cafés.",
+        image: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=400&q=80",
+        isJoined: true,
+        tag: "#MaharashtraPaws"
+      },
+      {
+        id: 3,
+        name: "Monsoon Pet Health & Feline Care India",
+        category: "Health & Nutrition",
+        members: 2890,
+        postsToday: 19,
+        description: "Vet-moderated advice on preventing tick fever, ear infections, paw hygiene during rainy season, and fresh diet recipes.",
+        image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=400&q=80",
+        isJoined: false,
+        tag: "#VetAdviceIndia"
+      },
+      {
+        id: 4,
+        name: "Bangalore Pet Treks & Cubbon Park Socials",
+        category: "Local Meetups",
+        members: 3760,
+        postsToday: 18,
+        description: "Sunday morning social walks under the bamboo groves of Cubbon Park and pet-friendly day treks around Nandi Hills.",
+        image: "https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=400&q=80",
+        isJoined: false,
+        tag: "#BLRDogs"
+      },
+      {
+        id: 5,
+        name: "Community Street Animal Feeders & ABC Network",
+        category: "Rescue & Welfare",
+        members: 7120,
+        postsToday: 45,
+        description: "Coordinating daily stray feeding routes, Animal Birth Control (ABC) sterilization drives, and winter coat distribution.",
+        image: "https://images.unsplash.com/photo-1589965716319-4a041b58fa8a?auto=format&fit=crop&w=400&q=80",
+        isJoined: true,
+        tag: "#CommunityCare"
+      },
+      {
+        id: 6,
+        name: "Indian House Rabbits & Exotic Herbivores",
+        category: "Small Pets",
+        members: 1120,
+        postsToday: 8,
+        description: "Safe greens available in Indian sabzi mandis, heatstroke prevention in summers, and free-roaming flat setups.",
+        image: "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=400&q=80",
+        isJoined: false,
+        tag: "#IndianBunnies"
+      }
+    ];
+
+    const initialDiscussions = [
+      {
+        id: 201,
+        groupName: "Monsoon Pet Health & Feline Care India",
+        author: "Dr. Radhika Sen, MVSc",
+        avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=150&q=80",
+        time: "45m ago",
+        title: "Monsoon Tick Prevention Protocol: Essential Checklist for Indian Pet Parents",
+        content: "With humidity soaring across Mumbai, Pune, and Bengaluru, tick fever cases spike drastically. Please check your dog's paws, underbellies, and ears after every walk. Oral chewables like Bravecto or Nexgard are safest, and always wipe paws dry. What tick-prevention measures are you currently using?",
+        replies: 38,
+        upvotes: 142
+      },
+      {
+        id: 202,
+        groupName: "Indie Dog Parents & Desi Rescue Tribe",
+        author: "Ranjana Chavan",
+        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
+        time: "2h ago",
+        title: "Easy Home-Cooked Diet Ratios for Rescued Desi Dogs (Turmeric + Curd + Liver)",
+        content: "Many first-time adopters ask me what Sheru eats! A balanced meal of 50% boiled chicken/liver with a pinch of turmeric, 30% cooked pumpkin/carrots, and 20% brown rice or oats topped with fresh curd keeps their digestion pristine. Indian Indies thrive on fresh, wholesome food!",
+        replies: 54,
+        upvotes: 210
+      },
+      {
+        id: 203,
+        groupName: "Pune & Mumbai Pet Guardians Club",
+        author: "Rohan Kulkarni",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+        time: "4h ago",
+        title: "Sunday Sunrise Walk at Shivaji Park, Mumbai — 6:30 AM Meetup!",
+        content: "Weather forecast is pleasant and cool! Let's meet at the Mayor's bungalow corner. We have 14 pet parents confirmed so far. Bring extra water and waste bags. All vaccinated dogs welcome!",
+        replies: 21,
+        upvotes: 68
+      }
+    ];
+
+    const teamMembers = [
+      {
+        name: "Dr. Radhika Sen",
+        role: "Chief Veterinary Advisor",
+        credentials: "MVSc, Mumbai Veterinary College",
+        pet: "Simba & Tara (Rescue Cats)",
+        bio: "Practicing surgeon with 14+ years in canine medicine and emergency animal rescue. Regular keynote speaker at Indian Veterinary Congress.",
+        image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        name: "Ranjana Chavan",
+        role: "Founder & Community Lead",
+        credentials: "Animal Welfare Crusader, Pune / Mumbai",
+        pet: "Sheru (Indie) & Meenu (Persian Mix)",
+        bio: "Started PawSocial India to build an inclusive digital sanctuary for Indian pet parents and champion the adoption of native Desi dogs and cats.",
+        image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        name: "Karan Mehra",
+        role: "Head of Behavior & Positive Training",
+        credentials: "Canine Behaviorist & CPDT-KA",
+        pet: "Leo (Golden Retriever)",
+        bio: "Advocating for 100% force-free reward-based training across urban Indian households, helping address leash reactivity and urban stress.",
+        image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        name: "Pooja Nair",
+        role: "Design & Shelter Advocacy Director",
+        credentials: "Ex-Zomato Designer & RESQ Volunteer",
+        pet: "Mithoo (Holland Lop Bunny)",
+        bio: "Crafting intuitive digital tools that empower local Indian shelter alliances and celebrate the unique bond between human and animal companions.",
+        image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80"
+      }
+    ];
+
+    const faqs = [
+      {
+        q: "What makes PawSocial India specially crafted for Indian pet parents?",
+        a: "PawSocial India is tailored to the realities of pet parenting in India. We emphasize native Desi Indie dogs and cats, provide verified listings of AAHA/VCI licensed Indian animal hospitals, share monsoon and festival care guides, and connect users with local street feeder networks."
+      },
+      {
+        q: "How are veterinarians and pet clinics verified across Indian cities?",
+        a: "Every clinic and hospital with our verified checkmark is audited against Veterinary Council of India (VCI) registrations, 24/7 emergency readiness, sanitation standards, and transparent fee policies."
+      },
+      {
+        q: "Can I register both native Indie street dogs and pedigree pets?",
+        a: "Absolutely! PawSocial is an inclusive community. We proudly celebrate native Indian Pariah dogs, Rajapalayams, Mudhol Hounds, Indie cats, as well as Golden Retrievers, Labradors, and Persians alike."
+      },
+      {
+        q: "Is PawSocial free for individual Indian pet parents and registered animal NGOs?",
+        a: "Yes! PawSocial is 100% free for pet owners. Registered 501(c)(3) and Indian Section 8 animal welfare organizations (like RESQ, Yoda, Friendicoes, and SPCA) receive free verified broadcast accounts."
+      },
+      {
+        q: "How does the nearby pet playdate finder protect pet guardian privacy?",
+        a: "We never expose exact residential addresses. Proximity is displayed only within approximate neighborhood radii (e.g. '0.3 km away' or 'Koregaon Park, Pune'), and location discovery can be toggled off anytime."
+      },
+      {
+        q: "What should I do in case of a pet medical emergency in India?",
+        a: "Navigate to our Services tab and select '24/7 Emergency'. You will find direct dial lines to round-the-clock trauma hospitals like Crown Vet, Cessna Lifeline, DCC, and city animal ambulance helplines."
+      }
+    ];
+
+    // ==========================================
+    // REUSABLE UI PRIMITIVES
+    // ==========================================
+    const Card = ({ children, className = "", onClick, hoverable = false }) => (
+      <div 
+        onClick={onClick}
+        className={`bg-white rounded-2xl shadow-soft border border-slate-100 transition-all duration-200 ${hoverable ? 'hover:shadow-card hover:-translate-y-0.5 cursor-pointer' : ''} ${className}`}
+      >
+        {children}
+      </div>
+    );
+
+    const Button = ({ children, primary, secondary, outline, danger, className = "", onClick, disabled, type="button", icon }) => {
+      let variant = "bg-slate-100 text-slate-700 hover:bg-slate-200 active:bg-slate-300";
+      if (primary) {
+        variant = "bg-primary text-white hover:bg-primaryHover active:bg-orange-700 shadow-sm shadow-orange-500/20";
+      } else if (secondary) {
+        variant = "bg-orange-50 text-primary hover:bg-orange-100 active:bg-orange-200";
+      } else if (outline) {
+        variant = "border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300";
+      } else if (danger) {
+        variant = "bg-rose-50 text-rose-600 hover:bg-rose-100";
+      }
+
+      return (
+        <button
+          type={type}
+          disabled={disabled}
+          onClick={onClick}
+          className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${variant} ${className}`}
+        >
+          {icon && <i data-lucide={icon} className="w-4 h-4"></i>}
+          {children}
+        </button>
+      );
+    };
+
+    const Badge = ({ children, color = "orange", className = "" }) => {
+      const colorMap = {
+        orange: "bg-orange-50 text-orange-700 border-orange-200/60",
+        emerald: "bg-emerald-50 text-emerald-700 border-emerald-200/60",
+        blue: "bg-blue-50 text-blue-700 border-blue-200/60",
+        purple: "bg-purple-50 text-purple-700 border-purple-200/60",
+        slate: "bg-slate-100 text-slate-700 border-slate-200",
+      };
+      return (
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${colorMap[color] || colorMap.orange} ${className}`}>
+          {children}
+        </span>
+      );
+    };
+
+    // ==========================================
+    // TOAST CONTAINER
+    // ==========================================
+    const ToastContainer = ({ toasts, removeToast }) => (
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
+        {toasts.map(toast => (
+          <div
+            key={toast.id}
+            className="pointer-events-auto flex items-center gap-3 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-floating animate-slide-up text-sm font-medium border border-slate-800"
+          >
+            <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${toast.type === 'error' ? 'bg-rose-500' : 'bg-primary'}`}>
+              <i data-lucide={toast.type === 'error' ? 'alert-triangle' : 'check'} className="w-4 h-4 text-white"></i>
+            </div>
+            <div className="flex-1">{toast.message}</div>
+            <button onClick={() => removeToast(toast.id)} className="text-slate-400 hover:text-white p-1">
+              <i data-lucide="x" className="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+
+    // ==========================================
+    // GENERIC MODAL
+    // ==========================================
+    const Modal = ({ isOpen, onClose, title, children, maxWidth = "max-w-lg" }) => {
+      if (!isOpen) return null;
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="fixed inset-0" onClick={onClose}></div>
+          <div className={`relative bg-white rounded-2xl shadow-floating border border-slate-100 w-full ${maxWidth} max-h-[90vh] overflow-y-auto animate-slide-up z-10`}>
+            <div className="sticky top-0 bg-white/95 backdrop-blur-md px-6 py-4 border-b border-slate-100 flex items-center justify-between z-10">
+              <h3 className="font-bold text-lg text-slate-800">{title}</h3>
+              <button 
+                onClick={onClose} 
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors"
+              >
+                <i data-lucide="x" className="w-4 h-4"></i>
+              </button>
+            </div>
+            <div className="p-6">
+              {children}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ==========================================
+    // SCREEN 1: HOME (PET POSTS, TRENDING, NEARBY)
+    // ==========================================
+    const HomeScreen = ({ 
+      posts, 
+      pets, 
+      onLike, 
+      onAddComment, 
+      onOpenCreatePost, 
+      onOpenPetDetail, 
+      onToggleFollow,
+      activePet,
+      isLoggedIn,
+      onOpenAuth,
+      onNavigate
+    }) => {
+      const [commentInputs, setCommentInputs] = useState({});
+      const [openCommentsPostId, setOpenCommentsPostId] = useState(null);
+      const [filterTag, setFilterTag] = useState("All");
+
+      const handleCommentSubmit = (postId) => {
+        const text = commentInputs[postId];
+        if (!text || !text.trim()) return;
+        onAddComment(postId, text);
+        setCommentInputs(prev => ({ ...prev, [postId]: "" }));
+      };
+
+      const tags = ["All", "#IndiePride", "#MumbaiDogs", "#CatsofIndia", "#AdoptDontShop", "#PunePaws"];
+
+      const filteredPosts = filterTag === "All" 
+        ? posts 
+        : posts.filter(p => p.tag === filterTag);
+
+      return (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Main Feed Column */}
+          <div className="lg:col-span-8 space-y-6">
+            
+            {/* Story / Pet Radar Status Bar */}
+            <Card className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Paws on the Radar • India 🇮🇳</span>
+                <span className="text-xs font-semibold text-primary cursor-pointer hover:underline" onClick={() => onNavigate('pets')}>Explore Directory →</span>
+              </div>
+              <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-1">
+                {/* Active user status add */}
+                <div 
+                  onClick={isLoggedIn ? onOpenCreatePost : onOpenAuth}
+                  className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer group"
+                >
+                  <div className="relative w-16 h-16 rounded-full border-2 border-dashed border-primary flex items-center justify-center bg-orange-50 text-primary group-hover:bg-orange-100 transition-colors">
+                    <i data-lucide="plus" className="w-6 h-6 stroke-[2.5]"></i>
+                  </div>
+                  <span className="text-xs font-semibold text-slate-700">Add Story</span>
+                </div>
+
+                {/* Pets active stories */}
+                {pets.map(pet => (
+                  <div 
+                    key={pet.id} 
+                    onClick={() => onOpenPetDetail(pet)}
+                    className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer group"
+                  >
+                    <div className="relative p-0.5 rounded-full bg-gradient-to-tr from-orange-500 to-amber-400 group-hover:scale-105 transition-transform">
+                      <div className="w-15 h-15 p-0.5 bg-white rounded-full">
+                        <img 
+                          src={pet.avatar} 
+                          alt={pet.name} 
+                          className="w-14 h-14 rounded-full object-cover"
+                        />
+                      </div>
+                      <span className="absolute bottom-0 right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+                    </div>
+                    <span className="text-xs font-medium text-slate-700 max-w-[64px] truncate">{pet.name}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Quick Post Creator Widget */}
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <img 
+                  src={activePet ? activePet.avatar : "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80"} 
+                  alt="Active Pet" 
+                  className="w-11 h-11 rounded-full object-cover border-2 border-orange-100 shrink-0" 
+                />
+                <button
+                  onClick={isLoggedIn ? onOpenCreatePost : onOpenAuth}
+                  className="flex-1 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl px-4 py-3 text-left text-sm text-slate-500 transition-colors flex items-center justify-between group"
+                >
+                  <span>Share what {activePet ? activePet.name : "your pet"} is doing today...</span>
+                  <i data-lucide="image" className="w-4 h-4 text-slate-400 group-hover:text-primary transition-colors"></i>
+                </button>
+                <Button 
+                  primary 
+                  onClick={isLoggedIn ? onOpenCreatePost : onOpenAuth}
+                  icon="send"
+                  className="hidden sm:inline-flex"
+                >
+                  Post
+                </Button>
+              </div>
+
+              {/* Quick Tags Filter */}
+              <div className="flex items-center gap-2 pt-3 mt-3 border-t border-slate-100 overflow-x-auto hide-scrollbar">
+                <span className="text-xs text-slate-400 font-semibold shrink-0">Topic:</span>
+                {tags.map(t => (
+                  <button
+                    key={t}
+                    onClick={() => setFilterTag(t)}
+                    className={`text-xs px-3 py-1 rounded-full font-medium transition-all shrink-0 ${filterTag === t ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </Card>
+
+            {/* Posts Stream */}
+            <div className="space-y-6">
+              {filteredPosts.map(post => {
+                const isCommentsOpen = openCommentsPostId === post.id;
+                return (
+                  <Card key={post.id} className="overflow-hidden border border-slate-100">
+                    {/* Post Header */}
+                    <div className="p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div 
+                          onClick={() => {
+                            const found = pets.find(p => p.id === post.petId);
+                            if (found) onOpenPetDetail(found);
+                          }}
+                          className="relative cursor-pointer group"
+                        >
+                          <img 
+                            src={post.avatar} 
+                            alt={post.author} 
+                            className="w-11 h-11 rounded-full object-cover border border-orange-100 group-hover:ring-2 ring-primary transition-all" 
+                          />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 
+                              onClick={() => {
+                                const found = pets.find(p => p.id === post.petId);
+                                if (found) onOpenPetDetail(found);
+                              }}
+                              className="font-bold text-slate-800 text-sm hover:text-primary cursor-pointer transition-colors"
+                            >
+                              {post.author}
+                            </h4>
+                            <span className="text-xs text-slate-400">•</span>
+                            <span className="text-xs font-semibold text-primary bg-orange-50 px-2 py-0.5 rounded-full">{post.species}</span>
+                          </div>
+                          <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
+                            <span>Guardian: {post.owner}</span>
+                            <span>•</span>
+                            <span>{post.time}</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Badge color="slate">{post.tag}</Badge>
+                      </div>
+                    </div>
+
+                    {/* Post Image */}
+                    {post.image && (
+                      <div className="relative w-full bg-slate-100 overflow-hidden group">
+                        <img 
+                          src={post.image} 
+                          alt="Post attachment" 
+                          className="w-full max-h-[460px] object-cover group-hover:scale-[1.01] transition-transform duration-300" 
+                        />
+                      </div>
+                    )}
+
+                    {/* Post Content */}
+                    <div className="p-5">
+                      <p className="text-slate-700 text-sm leading-relaxed mb-4 whitespace-pre-line font-body">
+                        {post.content}
+                      </p>
+
+                      {/* Post Actions Row */}
+                      <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-slate-500">
+                        <div className="flex items-center gap-6">
+                          <button 
+                            onClick={() => onLike(post.id)}
+                            className={`flex items-center gap-1.5 text-sm font-semibold transition-all ${post.isLiked ? 'text-rose-500 animate-heart-pop' : 'hover:text-rose-500'}`}
+                          >
+                            <i 
+                              data-lucide="heart" 
+                              className={`w-5 h-5 ${post.isLiked ? 'fill-rose-500 text-rose-500' : ''}`}
+                            ></i>
+                            <span>{post.likes}</span>
+                          </button>
+
+                          <button 
+                            onClick={() => setOpenCommentsPostId(isCommentsOpen ? null : post.id)}
+                            className="flex items-center gap-1.5 text-sm font-semibold hover:text-primary transition-colors"
+                          >
+                            <i data-lucide="message-circle" className="w-5 h-5"></i>
+                            <span>{post.comments ? post.comments.length : 0}</span>
+                          </button>
+
+                          <button 
+                            onClick={() => {
+                              navigator.clipboard?.writeText(window.location.href);
+                              alert("Post link copied to clipboard!");
+                            }}
+                            className="flex items-center gap-1.5 text-sm font-semibold hover:text-primary transition-colors"
+                          >
+                            <i data-lucide="share-2" className="w-5 h-5"></i>
+                            <span className="hidden sm:inline">Share</span>
+                          </button>
+                        </div>
+
+                        <button className="text-slate-400 hover:text-primary transition-colors" title="Bookmark post">
+                          <i data-lucide="bookmark" className="w-5 h-5"></i>
+                        </button>
+                      </div>
+
+                      {/* Comments Drawer */}
+                      {isCommentsOpen && (
+                        <div className="mt-4 pt-4 border-t border-slate-100 space-y-3 animate-fade-in">
+                          {post.comments && post.comments.length > 0 ? (
+                            <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                              {post.comments.map(c => (
+                                <div key={c.id} className="flex gap-2.5 items-start bg-slate-50/80 p-2.5 rounded-xl text-xs">
+                                  <img src={c.avatar} alt={c.author} className="w-7 h-7 rounded-full object-cover shrink-0 mt-0.5" />
+                                  <div className="flex-1">
+                                    <div className="flex items-center justify-between">
+                                      <span className="font-bold text-slate-800">{c.author}</span>
+                                      <span className="text-[10px] text-slate-400">{c.time}</span>
+                                    </div>
+                                    <p className="text-slate-600 mt-0.5">{c.text}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-slate-400 italic py-1">No comments yet. Be the first to leave a friendly paw print!</p>
+                          )}
+
+                          {/* Write Comment Box */}
+                          <div className="flex gap-2 pt-1">
+                            <input
+                              type="text"
+                              value={commentInputs[post.id] || ""}
+                              onChange={(e) => setCommentInputs({ ...commentInputs, [post.id]: e.target.value })}
+                              onKeyDown={(e) => { if (e.key === 'Enter') handleCommentSubmit(post.id); }}
+                              placeholder="Write a comment..."
+                              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                            />
+                            <Button 
+                              primary 
+                              onClick={() => handleCommentSubmit(post.id)}
+                              className="text-xs py-2 px-3"
+                            >
+                              Send
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right Sidebar: Trending & Nearby */}
+          <div className="lg:col-span-4 space-y-6">
+            
+            {/* Spotlight Pet of India Card */}
+            <Card className="p-5 border-orange-200 bg-gradient-to-br from-orange-50/80 via-white to-amber-50/50 relative overflow-hidden">
+              <div className="flex gap-3 items-center mb-3">
+                <img 
+                  src="https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80" 
+                  alt="Spotlight" 
+                  className="w-14 h-14 rounded-2xl object-cover shadow-sm border-2 border-white" 
+                />
+                <div>
+                  <h4 className="font-bold text-slate-800">Sheru the Indie</h4>
+                  <p className="text-xs text-slate-500">Koregaon Park, Pune</p>
+                  <p className="text-[11px] text-primary font-semibold mt-0.5">🇮🇳 Desi Pride Champion</p>
+                </div>
+              </div>
+              <p className="text-xs text-slate-600 mb-3 leading-relaxed">
+                Sheru & guardian Ranjana Chavan lead weekly stray dog feeding drives and Indie rescue awareness in Pune.
+              </p>
+              <Button 
+                secondary 
+                onClick={() => {
+                  const b = pets.find(p => p.id === 1);
+                  if (b) onOpenPetDetail(b);
+                }}
+                className="w-full text-xs py-2"
+              >
+                Say Hello to Sheru
+              </Button>
+            </Card>
+
+            {/* Trending Tags Widget */}
+            <Card className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i data-lucide="trending-up" className="w-4 h-4 text-primary"></i>
+                  Trending in India
+                </h3>
+                <span className="text-xs text-slate-400">Live</span>
+              </div>
+              <div className="space-y-3">
+                {[
+                  { tag: "#IndiePride", count: "4.8k posts", trend: "+32% today" },
+                  { tag: "#MonsoonPetCare", count: "2.4k posts", trend: "+45% today" },
+                  { tag: "#AdoptDontShopIndia", count: "8.6k posts", trend: "+20% today" },
+                  { tag: "#CubbonParkWalks", count: "1.9k posts", trend: "+18% today" },
+                  { tag: "#PunePetParents", count: "3.1k posts", trend: "+28% today" },
+                ].map(item => (
+                  <div 
+                    key={item.tag} 
+                    onClick={() => setFilterTag(item.tag)}
+                    className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors group"
+                  >
+                    <div>
+                      <p className="font-bold text-xs text-slate-800 group-hover:text-primary transition-colors">{item.tag}</p>
+                      <p className="text-[11px] text-slate-400">{item.count}</p>
+                    </div>
+                    <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{item.trend}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Nearby Pets Widget */}
+            <Card className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i data-lucide="map-pin" className="w-4 h-4 text-primary"></i>
+                  Nearby Furry Neighbors
+                </h3>
+                <span className="text-xs text-slate-400">Pune & Mumbai</span>
+              </div>
+              <div className="space-y-3">
+                {pets.slice(2, 6).map(pet => (
+                  <div key={pet.id} className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 transition-colors">
+                    <div 
+                      onClick={() => onOpenPetDetail(pet)}
+                      className="flex items-center gap-3 cursor-pointer group"
+                    >
+                      <img src={pet.avatar} alt={pet.name} className="w-10 h-10 rounded-full object-cover border border-slate-100 group-hover:ring-2 ring-primary transition-all" />
+                      <div>
+                        <p className="font-bold text-xs text-slate-800 group-hover:text-primary transition-colors">{pet.name}</p>
+                        <p className="text-[11px] text-slate-400">{pet.breed} • {pet.distance}</p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => onToggleFollow(pet.id)}
+                      className={`text-xs py-1.5 px-3 rounded-lg ${pet.isFollowed ? 'bg-slate-100 text-slate-600' : 'bg-orange-50 text-primary hover:bg-orange-100'}`}
+                    >
+                      {pet.isFollowed ? 'Following' : '+ Follow'}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Verified Indian Vet Network Mini Banner */}
+            <Card className="p-5 bg-slate-900 text-white rounded-2xl">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-orange-500/20 text-primary flex items-center justify-center">
+                  <i data-lucide="shield-check" className="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm text-white">PawCare India Certified</h4>
+                  <p className="text-xs text-slate-400">Over 1,200 vetted clinics</p>
+                </div>
+              </div>
+              <p className="text-xs text-slate-300 mb-4 leading-relaxed">
+                Connect with 24/7 emergency veterinary hospitals, cage-free resorts, and organic groomers across Indian metro cities.
+              </p>
+              <button 
+                onClick={() => onNavigate('services')}
+                className="w-full bg-white text-slate-900 hover:bg-slate-100 py-2 rounded-xl text-xs font-bold transition-colors"
+              >
+                Browse Indian Pet Services
+              </button>
+            </Card>
+
+          </div>
+        </div>
+      );
+    };
+
+    // ==========================================
+    // SCREEN 2: PETS (PET PROFILES, CATEGORIES, SEARCH)
+    // ==========================================
+    const PetsScreen = ({ pets, onOpenPetDetail, onOpenAddPet, onToggleFollow, isLoggedIn, onOpenAuth }) => {
+      const [searchTerm, setSearchTerm] = useState("");
+      const [selectedSpecies, setSelectedSpecies] = useState("All");
+      const [sortBy, setSortBy] = useState("popular");
+
+      const speciesList = ["All", "Dog", "Cat", "Rabbit"];
+
+      const filteredPets = pets.filter(pet => {
+        const matchesSearch = pet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                              pet.breed.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                              pet.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                              pet.bio.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesSpecies = selectedSpecies === "All" || pet.species.toLowerCase() === selectedSpecies.toLowerCase();
+        return matchesSearch && matchesSpecies;
+      }).sort((a, b) => {
+        if (sortBy === "popular") return b.followers - a.followers;
+        if (sortBy === "name") return a.name.localeCompare(b.name);
+        return 0;
+      });
+
+      return (
+        <div className="space-y-6">
+          {/* Header Banner */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-orange-500 to-amber-500 rounded-3xl p-8 text-white shadow-soft">
+            <div>
+              <span className="bg-white/20 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-2 inline-block">
+                Indian Pet Directory 🇮🇳
+              </span>
+              <h1 className="text-3xl font-extrabold tracking-tight mt-1">Discover Incredible Pets of India</h1>
+              <p className="text-orange-100 text-sm mt-1 max-w-xl">
+                Explore profiles of Desi Indie rescues, Golden Retrievers, Persian cats, and bunnies across Pune, Mumbai, Bengaluru, and Delhi.
+              </p>
+            </div>
+            <Button 
+              onClick={isLoggedIn ? onOpenAddPet : onOpenAuth}
+              className="bg-white text-primary hover:bg-orange-50 shadow-md py-3 px-6 text-sm shrink-0"
+              icon="plus-circle"
+            >
+              Register Pet Profile
+            </Button>
+          </div>
+
+          {/* Search & Filter Bar */}
+          <Card className="p-4">
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+              {/* Search input */}
+              <div className="relative flex-1 w-full">
+                <i data-lucide="search" className="absolute left-3.5 top-3 w-4 h-4 text-slate-400"></i>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search pets by name, breed, or city (e.g. 'Sheru', 'Indie', 'Pune')..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                />
+                {searchTerm && (
+                  <button onClick={() => setSearchTerm("")} className="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" className="w-4 h-4"></i>
+                  </button>
+                )}
+              </div>
+
+              {/* Species Category Filter Pills */}
+              <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar w-full md:w-auto">
+                {speciesList.map(sp => (
+                  <button
+                    key={sp}
+                    onClick={() => setSelectedSpecies(sp)}
+                    className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${selectedSpecies === sp ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                  >
+                    {sp === "All" ? "🐾 All Indian Pets" : sp === "Dog" ? "🐕 Dogs" : sp === "Cat" ? "🐈 Cats" : "🐇 Rabbits"}
+                  </button>
+                ))}
+              </div>
+
+              {/* Sort Dropdown */}
+              <div className="flex items-center gap-2 w-full md:w-auto">
+                <span className="text-xs text-slate-400 font-semibold shrink-0">Sort:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-primary/20"
+                >
+                  <option value="popular">Most Popular</option>
+                  <option value="name">Alphabetical</option>
+                </select>
+              </div>
+            </div>
+          </Card>
+
+          {/* Pets Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredPets.map(pet => (
+              <Card key={pet.id} className="overflow-hidden group hover:shadow-card-hover transition-all duration-300">
+                {/* Cover & Avatar Header */}
+                <div className="relative h-32 bg-slate-200 overflow-hidden">
+                  <img 
+                    src={pet.coverImage} 
+                    alt={pet.name} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                  <div className="absolute top-3 right-3">
+                    <Badge color="orange">{pet.species}</Badge>
+                  </div>
+                </div>
+
+                <div className="p-5 pt-0 relative">
+                  {/* Floating Avatar */}
+                  <div className="-mt-12 mb-3 flex items-end justify-between">
+                    <div className="relative">
+                      <img 
+                        src={pet.avatar} 
+                        alt={pet.name} 
+                        className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-md bg-white" 
+                      />
+                      <span className="absolute bottom-1 right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+                    </div>
+
+                    <Button
+                      onClick={() => onToggleFollow(pet.id)}
+                      className={`text-xs py-1.5 px-4 rounded-xl ${pet.isFollowed ? 'bg-slate-100 text-slate-600' : 'bg-primary text-white shadow-sm'}`}
+                    >
+                      {pet.isFollowed ? 'Following' : '+ Follow'}
+                    </Button>
+                  </div>
+
+                  {/* Info */}
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-extrabold text-lg text-slate-800 group-hover:text-primary transition-colors">
+                        {pet.name}
+                      </h3>
+                      <span className="text-xs text-slate-400 font-medium">{pet.age}</span>
+                    </div>
+                    <p className="text-xs font-semibold text-primary mb-1">{pet.breed}</p>
+                    <p className="text-xs text-slate-400 flex items-center gap-1 mb-3">
+                      <i data-lucide="map-pin" className="w-3.5 h-3.5"></i>
+                      {pet.location}
+                    </p>
+
+                    <p className="text-xs text-slate-600 line-clamp-2 mb-4 leading-relaxed">
+                      {pet.bio}
+                    </p>
+
+                    {/* Badges */}
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {pet.badges.slice(0, 2).map((b, i) => (
+                        <span key={i} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
+                          {b}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Stats Footer */}
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-xs text-slate-500">
+                        <span><strong className="text-slate-800">{pet.followers.toLocaleString()}</strong> fans</span>
+                        <span>•</span>
+                        <span>Guardian: <strong className="text-slate-700">{pet.owner.split(' ')[0]}</strong></span>
+                      </div>
+                      <button 
+                        onClick={() => onOpenPetDetail(pet)}
+                        className="text-xs font-bold text-primary hover:text-primaryHover transition-colors flex items-center gap-1"
+                      >
+                        Profile <i data-lucide="arrow-right" className="w-3.5 h-3.5"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          {filteredPets.length === 0 && (
+            <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200">
+              <i data-lucide="paw-print" className="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+              <h3 className="font-bold text-slate-700 text-lg">No furry friends found</h3>
+              <p className="text-xs text-slate-400 mt-1">Try adjusting your keyword or species filter.</p>
+              <Button secondary onClick={() => { setSearchTerm(""); setSelectedSpecies("All"); }} className="mt-4 text-xs">
+                Clear Filters
+              </Button>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // ==========================================
+    // SCREEN 3: COMMUNITY (POSTS, COMMENTS, GROUPS)
+    // ==========================================
+    const CommunityScreen = ({ 
+      groups, 
+      discussions, 
+      onToggleJoinGroup, 
+      onOpenCreateGroup, 
+      onOpenCreateDiscussion,
+      isLoggedIn,
+      onOpenAuth
+    }) => {
+      const [communityTab, setCommunityTab] = useState("groups"); // 'groups' | 'feed' | 'my'
+      const [filterCategory, setFilterCategory] = useState("All");
+
+      const categories = ["All", "Indie & Desi Pride", "Local Meetups", "Health & Nutrition", "Rescue & Welfare", "Small Pets"];
+
+      const filteredGroups = groups.filter(g => {
+        if (communityTab === "my") return g.isJoined;
+        if (filterCategory === "All") return true;
+        return g.category === filterCategory;
+      });
+
+      return (
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
+                  PawSocial India Hubs
+                </span>
+                <span className="text-xs text-slate-400">24,500+ Pet Parents Active</span>
+              </div>
+              <h1 className="text-2xl font-extrabold text-slate-800">Pet Communities & Discussions</h1>
+              <p className="text-xs text-slate-500 mt-0.5">Connect with Desi dog guardians, local Mumbai-Pune walkers, and city animal feeder networks.</p>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button 
+                secondary
+                onClick={isLoggedIn ? onOpenCreateDiscussion : onOpenAuth}
+                icon="message-square"
+                className="text-xs"
+              >
+                Start Discussion
+              </Button>
+              <Button 
+                primary
+                onClick={isLoggedIn ? onOpenCreateGroup : onOpenAuth}
+                icon="plus-circle"
+                className="text-xs"
+              >
+                + Create Group
+              </Button>
+            </div>
+          </div>
+
+          {/* Sub Navigation Tabs */}
+          <div className="flex items-center justify-between border-b border-slate-200">
+            <div className="flex gap-6">
+              {[
+                { id: "groups", label: "Explore Groups", icon: "users" },
+                { id: "feed", label: "Discussions & Q&A", icon: "message-circle" },
+                { id: "my", label: "My Joined Groups", icon: "check-circle" },
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setCommunityTab(tab.id)}
+                  className={`flex items-center gap-2 pb-3.5 text-sm font-bold border-b-2 transition-all ${communityTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+                >
+                  <i data-lucide={tab.icon} className="w-4 h-4"></i>
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Category Filter Pills (For Groups) */}
+          {communityTab !== "feed" && (
+            <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+              {categories.map(c => (
+                <button
+                  key={c}
+                  onClick={() => setFilterCategory(c)}
+                  className={`text-xs px-3.5 py-1.5 rounded-xl font-semibold whitespace-nowrap transition-all ${filterCategory === c ? 'bg-primary text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200/80'}`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* GROUPS TAB */}
+          {communityTab !== "feed" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredGroups.map(group => (
+                <Card key={group.id} className="overflow-hidden flex flex-col justify-between group hover:shadow-card-hover transition-all">
+                  <div>
+                    {/* Image Banner */}
+                    <div className="relative h-36 bg-slate-200 overflow-hidden">
+                      <img 
+                        src={group.image} 
+                        alt={group.name} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                      <div className="absolute top-3 right-3">
+                        <Badge color="orange">{group.category}</Badge>
+                      </div>
+                      <div className="absolute bottom-3 left-3 text-white">
+                        <p className="text-[11px] font-semibold text-orange-200">{group.tag}</p>
+                      </div>
+                    </div>
+
+                    <div className="p-5">
+                      <h3 className="font-extrabold text-base text-slate-800 group-hover:text-primary transition-colors mb-1">
+                        {group.name}
+                      </h3>
+                      <p className="text-xs text-slate-500 mb-3 flex items-center gap-3">
+                        <span><strong>{group.members.toLocaleString()}</strong> Members</span>
+                        <span>•</span>
+                        <span className="text-emerald-600 font-semibold">{group.postsToday} posts today</span>
+                      </p>
+                      <p className="text-xs text-slate-600 leading-relaxed mb-4 line-clamp-2">
+                        {group.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-5 pt-0">
+                    <Button
+                      onClick={() => onToggleJoinGroup(group.id)}
+                      className={`w-full text-xs py-2 rounded-xl font-bold ${group.isJoined ? 'bg-slate-100 text-slate-600 hover:bg-slate-200' : 'bg-primary text-white shadow-sm'}`}
+                    >
+                      {group.isJoined ? 'Joined ✓' : '+ Join Group'}
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* DISCUSSIONS / FORUM FEED TAB */}
+          {communityTab === "feed" && (
+            <div className="space-y-4">
+              {discussions.map(item => (
+                <Card key={item.id} className="p-5 hover:shadow-card transition-all">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex gap-3">
+                      <img src={item.avatar} alt={item.author} className="w-10 h-10 rounded-full object-cover shrink-0 mt-1" />
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-bold text-xs text-slate-800">{item.author}</span>
+                          <span className="text-xs text-slate-400">•</span>
+                          <Badge color="slate">{item.groupName}</Badge>
+                          <span className="text-xs text-slate-400">• {item.time}</span>
+                        </div>
+                        <h3 className="font-bold text-slate-800 text-base hover:text-primary cursor-pointer transition-colors mb-2">
+                          {item.title}
+                        </h3>
+                        <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line mb-3">
+                          {item.content}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs text-slate-500">
+                    <div className="flex items-center gap-4">
+                      <button className="flex items-center gap-1.5 font-semibold hover:text-primary transition-colors">
+                        <i data-lucide="thumbs-up" className="w-4 h-4"></i>
+                        <span>{item.upvotes} Upvotes</span>
+                      </button>
+                      <button className="flex items-center gap-1.5 font-semibold hover:text-primary transition-colors">
+                        <i data-lucide="message-square" className="w-4 h-4"></i>
+                        <span>{item.replies} Replies</span>
+                      </button>
+                    </div>
+                    <button 
+                      onClick={() => alert(`Opening discussion: "${item.title}"`)}
+                      className="text-primary font-semibold hover:underline"
+                    >
+                      Join Discussion →
+                    </button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // ==========================================
+    // SCREEN 4: SERVICES (VETS, GROOMING, BOARDING IN INDIA)
+    // ==========================================
+    const ServicesScreen = ({ services, onOpenBookService }) => {
+      const [serviceFilter, setServiceFilter] = useState("All");
+      const [searchQuery, setSearchQuery] = useState("");
+
+      const categories = [
+        { label: "All Services", value: "All", icon: "layout-grid" },
+        { label: "Veterinarians", value: "Veterinarians", icon: "stethoscope" },
+        { label: "Grooming & Spa", value: "Grooming", icon: "scissors" },
+        { label: "Boarding & Resorts", value: "Boarding", icon: "home" },
+        { label: "Training & Behavior", value: "Training", icon: "award" }
+      ];
+
+      const filteredServices = services.filter(s => {
+        const matchesCategory = serviceFilter === "All" || s.category === serviceFilter;
+        const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              s.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              s.features.some(f => f.toLowerCase().includes(searchQuery.toLowerCase()));
+        return matchesCategory && matchesSearch;
+      });
+
+      return (
+        <div className="space-y-6">
+          {/* Hero Banner */}
+          <div className="relative rounded-3xl bg-slate-900 text-white p-8 md:p-10 overflow-hidden shadow-card">
+            <div className="absolute -right-10 -bottom-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="relative z-10 max-w-2xl">
+              <span className="bg-orange-500/20 text-orange-300 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3 inline-block border border-orange-500/30">
+                Verified Indian Pet Healthcare & Care
+              </span>
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mt-1">Trusted Pet Services Across India</h1>
+              <p className="text-slate-300 text-sm mt-2 leading-relaxed">
+                Connect with Crown Vet, Cessna Lifeline, boutique herbal Ayurvedic groomers, resort boarding suites, and humane behaviorists in Pune, Mumbai, Bengaluru, and NCR.
+              </p>
+            </div>
+          </div>
+
+          {/* Filters & Search */}
+          <Card className="p-4">
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+              {/* Search input */}
+              <div className="relative flex-1 w-full">
+                <i data-lucide="search" className="absolute left-3.5 top-3 w-4 h-4 text-slate-400"></i>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by clinic name, city, or service (e.g. 'Crown Vet', 'Pune', 'Emergency', 'Neem')..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                />
+              </div>
+
+              {/* Category Pills */}
+              <div className="flex gap-2 overflow-x-auto hide-scrollbar w-full md:w-auto">
+                {categories.map(cat => (
+                  <button
+                    key={cat.value}
+                    onClick={() => setServiceFilter(cat.value)}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${serviceFilter === cat.value ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                  >
+                    <i data-lucide={cat.icon} className="w-3.5 h-3.5"></i>
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </Card>
+
+          {/* Services Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredServices.map(service => (
+              <Card key={service.id} className="overflow-hidden flex flex-col justify-between group hover:shadow-card-hover transition-all">
+                <div>
+                  {/* Image & Badges */}
+                  <div className="relative h-44 bg-slate-200 overflow-hidden">
+                    <img 
+                      src={service.image} 
+                      alt={service.name} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                    <div className="absolute top-3 left-3">
+                      <span className="bg-white/95 backdrop-blur-md text-slate-800 text-xs font-bold px-2.5 py-1 rounded-lg shadow-sm flex items-center gap-1">
+                        <i data-lucide="star" className="w-3.5 h-3.5 text-amber-500 fill-amber-500"></i>
+                        {service.rating} ({service.reviewsCount})
+                      </span>
+                    </div>
+                    <div className="absolute top-3 right-3 flex gap-1">
+                      <span className="bg-white/90 backdrop-blur-md text-slate-800 text-xs font-bold px-2 py-0.5 rounded-lg shadow-sm">
+                        {service.consultFee}
+                      </span>
+                      <Badge color="orange">{service.priceTier}</Badge>
+                    </div>
+                    <div className="absolute bottom-3 left-3 text-white">
+                      <p className="text-xs font-medium text-orange-200">{service.hours}</p>
+                    </div>
+                  </div>
+
+                  {/* Body Content */}
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <h3 className="font-extrabold text-base text-slate-800 group-hover:text-primary transition-colors">
+                        {service.name}
+                      </h3>
+                    </div>
+                    
+                    <p className="text-xs font-bold text-primary mb-2 flex items-center gap-1">
+                      <i data-lucide="check-circle" className="w-3.5 h-3.5"></i>
+                      Verified Indian {service.type}
+                    </p>
+
+                    <p className="text-xs text-slate-400 flex items-center gap-1 mb-3">
+                      <i data-lucide="map-pin" className="w-3.5 h-3.5 shrink-0"></i>
+                      <span>{service.address}</span>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-slate-600 font-semibold">{service.distance}</span>
+                    </p>
+
+                    <p className="text-xs text-slate-600 leading-relaxed mb-4 line-clamp-2">
+                      {service.bio}
+                    </p>
+
+                    {/* Features list */}
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      {service.features.map((f, i) => (
+                        <span key={i} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
+                          {f}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Action */}
+                <div className="p-5 pt-0 border-t border-slate-100 mt-2 flex items-center justify-between gap-3">
+                  <a 
+                    href={`tel:${service.phone}`}
+                    className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors flex items-center justify-center shrink-0"
+                    title={`Call Clinic at ${service.phone}`}
+                  >
+                    <i data-lucide="phone" className="w-4 h-4"></i>
+                  </a>
+                  <Button 
+                    primary 
+                    onClick={() => onOpenBookService(service)}
+                    className="flex-1 text-xs py-2.5"
+                    icon="calendar"
+                  >
+                    Book Appointment
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    // ==========================================
+    // SCREEN 5: PROFILE OF RANJANA CHAVAN
+    // ==========================================
+    const ProfileScreen = ({ 
+      pets, 
+      posts, 
+      onOpenAddPet, 
+      onOpenPetDetail, 
+      onOpenCreatePost,
+      activePet, 
+      setActivePet,
+      onOpenEditProfile
+    }) => {
+      const [profileTab, setProfileTab] = useState("pets"); // 'pets' | 'posts' | 'followers'
+      
+      const myPets = pets.filter(p => p.owner === "Ranjana Chavan");
+      const myPosts = posts.filter(p => p.owner === "Ranjana Chavan");
+
+      return (
+        <div className="space-y-6">
+          {/* User Profile Card of Ranjana Chavan */}
+          <Card className="overflow-hidden border border-slate-100">
+            {/* Banner Cover */}
+            <div className="h-44 bg-gradient-to-r from-orange-400 via-amber-500 to-emerald-500 relative">
+              <div className="absolute inset-0 bg-black/10"></div>
+              <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-white text-xs font-bold">
+                🇮🇳 Maharashtra, India
+              </div>
+            </div>
+
+            <div className="p-6 sm:p-8 pt-0 relative">
+              <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between gap-4 -mt-16 sm:-mt-20 mb-6 text-center sm:text-left">
+                <div className="flex flex-col sm:flex-row items-center gap-5">
+                  <div className="relative">
+                    <img 
+                      src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80" 
+                      alt="Ranjana Chavan" 
+                      className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl object-cover border-4 border-white shadow-floating bg-white" 
+                    />
+                    <span className="absolute bottom-2 right-2 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full"></span>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-center sm:justify-start gap-2">
+                      <h1 className="text-2xl font-extrabold text-slate-800">Ranjana Chavan</h1>
+                      <Badge color="orange">Verified Indian Pet Parent</Badge>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-0.5">@ranjana_and_sheru • Koregaon Park, Pune • Member since 2024</p>
+                    <p className="text-xs text-slate-600 mt-2 max-w-md leading-relaxed">
+                      Proud mother to rescued Indie dog Sheru & Persian cat Meenu. Community stray feeder & animal rescue advocate across Pune & Mumbai. 🐾🇮🇳
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button outline onClick={onOpenEditProfile} className="text-xs py-2" icon="edit-2">
+                    Edit Profile
+                  </Button>
+                  <Button primary onClick={onOpenAddPet} className="text-xs py-2" icon="plus">
+                    Add Pet
+                  </Button>
+                </div>
+              </div>
+
+              {/* Metrics Row */}
+              <div className="grid grid-cols-4 gap-4 py-4 px-6 bg-slate-50 rounded-2xl text-center border border-slate-100">
+                <div>
+                  <p className="text-xl font-extrabold text-slate-800">{myPets.length}</p>
+                  <p className="text-xs text-slate-400 font-semibold">Registered Pets</p>
+                </div>
+                <div>
+                  <p className="text-xl font-extrabold text-slate-800">{myPosts.length}</p>
+                  <p className="text-xs text-slate-400 font-semibold">Moments Shared</p>
+                </div>
+                <div>
+                  <p className="text-xl font-extrabold text-slate-800">2,960</p>
+                  <p className="text-xs text-slate-400 font-semibold">Pack Followers</p>
+                </div>
+                <div>
+                  <p className="text-xl font-extrabold text-slate-800">480</p>
+                  <p className="text-xs text-slate-400 font-semibold">Following</p>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Sub Navigation */}
+          <div className="flex gap-6 border-b border-slate-200">
+            {[
+              { id: "pets", label: `My Pets (${myPets.length})`, icon: "paw-print" },
+              { id: "posts", label: `My Posts (${myPosts.length})`, icon: "grid" },
+              { id: "followers", label: "Pack & Followers", icon: "users" },
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setProfileTab(tab.id)}
+                className={`flex items-center gap-2 pb-3.5 text-sm font-bold border-b-2 transition-all ${profileTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+              >
+                <i data-lucide={tab.icon} className="w-4 h-4"></i>
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* TAB: MY PETS */}
+          {profileTab === "pets" && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {myPets.map(pet => (
+                <Card key={pet.id} className="p-5 flex flex-col justify-between group hover:shadow-card-hover transition-all">
+                  <div>
+                    <div className="relative mb-4">
+                      <img 
+                        src={pet.avatar} 
+                        alt={pet.name} 
+                        className="w-24 h-24 rounded-2xl mx-auto object-cover border-4 border-orange-50 shadow-md group-hover:scale-105 transition-transform" 
+                      />
+                      <span className="absolute bottom-0 right-1/3 translate-x-3 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                        {pet.species}
+                      </span>
+                    </div>
+
+                    <div className="text-center">
+                      <h3 className="font-extrabold text-lg text-slate-800">{pet.name}</h3>
+                      <p className="text-xs font-semibold text-primary mb-1">{pet.breed}</p>
+                      <p className="text-xs text-slate-400 mb-3">{pet.age} • {pet.weight}</p>
+                      <p className="text-xs text-slate-600 line-clamp-2 mb-4 leading-relaxed">{pet.bio}</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-3 border-t border-slate-100">
+                    <Button 
+                      outline 
+                      onClick={() => onOpenPetDetail(pet)}
+                      className="w-full text-xs py-2"
+                      icon="eye"
+                    >
+                      View Digital Passport
+                    </Button>
+                    <button 
+                      onClick={() => setActivePet(pet)}
+                      className={`w-full py-1.5 rounded-xl text-xs font-semibold transition-colors ${activePet && activePet.id === pet.id ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'text-slate-500 hover:bg-slate-50'}`}
+                    >
+                      {activePet && activePet.id === pet.id ? 'Active Persona ✓' : 'Switch to this Pet'}
+                    </button>
+                  </div>
+                </Card>
+              ))}
+
+              {/* Add New Pet Card Trigger */}
+              <div 
+                onClick={onOpenAddPet}
+                className="rounded-2xl border-2 border-dashed border-slate-200 bg-white hover:bg-orange-50/50 hover:border-primary/50 transition-all p-8 flex flex-col items-center justify-center text-center cursor-pointer min-h-[300px] group"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-orange-100 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <i data-lucide="plus" className="w-7 h-7 stroke-[2.5]"></i>
+                </div>
+                <h3 className="font-extrabold text-base text-slate-800 mb-1">Add Another Indian Pet</h3>
+                <p className="text-xs text-slate-500 max-w-xs leading-relaxed">
+                  Register a digital health passport for your Indie, Persian cat, puppy, or foster companion.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: MY POSTS */}
+          {profileTab === "posts" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {myPosts.map(post => (
+                <Card key={post.id} className="overflow-hidden">
+                  <img src={post.image} alt="Post" className="w-full h-48 object-cover" />
+                  <div className="p-4">
+                    <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                      <span>{post.time}</span>
+                      <Badge color="orange">{post.tag}</Badge>
+                    </div>
+                    <p className="text-xs text-slate-700 line-clamp-2 mb-3">{post.content}</p>
+                    <div className="flex items-center justify-between text-xs font-semibold text-slate-500 pt-2 border-t border-slate-100">
+                      <span>❤️ {post.likes} likes</span>
+                      <span>💬 {post.comments.length} comments</span>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* TAB: FOLLOWERS */}
+          {profileTab === "followers" && (
+            <Card className="p-6">
+              <h3 className="font-bold text-slate-800 text-base mb-4">Pack Connections Across India</h3>
+              <div className="space-y-3">
+                {pets.slice(2, 6).map(pet => (
+                  <div key={pet.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <img src={pet.avatar} alt={pet.name} className="w-11 h-11 rounded-full object-cover" />
+                      <div>
+                        <h4 className="font-bold text-sm text-slate-800">{pet.name}</h4>
+                        <p className="text-xs text-slate-400">{pet.breed} • Guardian: {pet.owner} ({pet.location.split(',')[0]})</p>
+                      </div>
+                    </div>
+                    <Button 
+                      outline 
+                      onClick={() => alert(`Direct message opened with ${pet.owner} (${pet.name}'s guardian)!`)}
+                      className="text-xs py-1.5 px-3"
+                    >
+                      Message
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+        </div>
+      );
+    };
+
+    // ==========================================
+    // SCREEN 6: ABOUT (ABOUT US, HOW IT WORKS, TEAM)
+    // ==========================================
+    const AboutScreen = () => {
+      return (
+        <div className="space-y-12 max-w-5xl mx-auto py-4">
+          {/* Mission Hero */}
+          <div className="text-center space-y-4">
+            <span className="bg-primary text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full inline-block">
+              Our Vision for Indian Animals 🇮🇳
+            </span>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight max-w-2xl mx-auto leading-tight">
+              A Kinder, Healthier World for Every Pet Across India.
+            </h1>
+            <p className="text-slate-600 text-base max-w-2xl mx-auto leading-relaxed">
+              Founded by Ranjana Chavan and veterinary doctors, PawSocial India connects pet parents from Pune to Delhi, promotes native Indie adoption, and ensures every street animal and pet receives compassionate medical care.
+            </p>
+          </div>
+
+          {/* Metric Stats Banner */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { val: "50,000+", label: "Indian Pets Registered", icon: "paw-print" },
+              { val: "120,000+", label: "Moments Shared", icon: "image" },
+              { val: "1,200+", label: "Verified Vets in India", icon: "shield-check" },
+              { val: "₹25 Lakhs+", label: "Subsidized Shelter Aid", icon: "heart" },
+            ].map((stat, i) => (
+              <Card key={i} className="p-6 text-center">
+                <div className="w-10 h-10 rounded-xl bg-orange-50 text-primary flex items-center justify-center mx-auto mb-3">
+                  <i data-lucide={stat.icon} className="w-5 h-5"></i>
+                </div>
+                <p className="text-2xl md:text-3xl font-extrabold text-slate-800">{stat.val}</p>
+                <p className="text-xs text-slate-400 font-semibold mt-1">{stat.label}</p>
+              </Card>
+            ))}
+          </div>
+
+          {/* How It Works Section */}
+          <div className="space-y-6">
+            <div className="text-center">
+              <span className="text-xs font-bold uppercase tracking-wider text-primary">Simple Journey</span>
+              <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800 mt-1">How PawSocial India Works</h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  step: "01",
+                  title: "Build Digital Passports",
+                  desc: "Create comprehensive digital records with vaccination dates (Rabies, DHPPi), deworming logs, and dietary preferences.",
+                  icon: "user-check"
+                },
+                {
+                  step: "02",
+                  title: "Connect & Discover",
+                  desc: "Find nearby pet neighbors in your locality, join Indie dog clubs, coordinate Cubbon Park & Shivaji Park meetups.",
+                  icon: "compass"
+                },
+                {
+                  step: "03",
+                  title: "Book Trusted Indian Care",
+                  desc: "Access verified 24/7 hospitals like Crown Vet and Cessna Lifeline, cage-free resorts, and certified trainers with transparent pricing in ₹.",
+                  icon: "calendar-check"
+                }
+              ].map((item, i) => (
+                <Card key={i} className="p-6 text-left relative overflow-hidden group hover:shadow-card transition-all">
+                  <span className="text-4xl font-extrabold text-orange-100 absolute top-4 right-4 pointer-events-none group-hover:text-orange-200 transition-colors">
+                    {item.step}
+                  </span>
+                  <div className="w-12 h-12 rounded-xl bg-primary text-white flex items-center justify-center mb-4 shadow-sm">
+                    <i data-lucide={item.icon} className="w-6 h-6"></i>
+                  </div>
+                  <h3 className="font-bold text-lg text-slate-800 mb-2">{item.title}</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">{item.desc}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Team Section */}
+          <div className="space-y-6 pt-6">
+            <div className="text-center">
+              <span className="text-xs font-bold uppercase tracking-wider text-primary">Passionate Indian Animal Advocates</span>
+              <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800 mt-1">Meet the PawSocial India Team</h2>
+              <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">Founded by Ranjana Chavan and guided by veterinarians and certified trainers.</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {teamMembers.map((member, i) => (
+                <Card key={i} className="overflow-hidden group hover:shadow-card-hover transition-all">
+                  <div className="h-48 overflow-hidden bg-slate-100">
+                    <img 
+                      src={member.image} 
+                      alt={member.name} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                    />
+                  </div>
+                  <div className="p-5 text-center">
+                    <h4 className="font-bold text-base text-slate-800">{member.name}</h4>
+                    <p className="text-xs font-semibold text-primary mb-1">{member.role}</p>
+                    <p className="text-[11px] text-slate-400 mb-2">{member.credentials}</p>
+                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">{member.bio}</p>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ==========================================
+    // SCREEN 7: CONTACT (FORM, SUPPORT, FAQ)
+    // ==========================================
+    const ContactScreen = ({ onSendContactMessage }) => {
+      const [form, setForm] = useState({
+        name: "Ranjana Chavan",
+        email: "ranjana.chavan@pawsocial.in",
+        topic: "General Inquiry",
+        message: ""
+      });
+      const [submitted, setSubmitted] = useState(false);
+      const [openFaqIndex, setOpenFaqIndex] = useState(0);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!form.name || !form.email || !form.message) {
+          alert("Please fill out all required fields.");
+          return;
+        }
+        onSendContactMessage(form);
+        setSubmitted(true);
+      };
+
+      return (
+        <div className="space-y-12 max-w-5xl mx-auto py-4">
+          {/* Header */}
+          <div className="text-center space-y-2">
+            <span className="bg-primary text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full inline-block">
+              We’re Here for You • India Support
+            </span>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Get in Touch with PawSocial India
+            </h1>
+            <p className="text-slate-600 text-sm max-w-xl mx-auto">
+              Questions regarding Indian pet records, veterinary hospital partnerships, or shelter alliances in Pune, Mumbai, Bengaluru, or Delhi? We're here to help.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Contact Form Column */}
+            <div className="lg:col-span-7">
+              <Card className="p-6 sm:p-8">
+                {submitted ? (
+                  <div className="text-center py-12 space-y-3">
+                    <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+                      <i data-lucide="check" className="w-8 h-8 stroke-[3]"></i>
+                    </div>
+                    <h3 className="font-extrabold text-xl text-slate-800">Message Received!</h3>
+                    <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+                      Thank you for contacting us. A member of our Indian pet care desk will respond within 4 hours.
+                    </p>
+                    <Button secondary onClick={() => { setSubmitted(false); setForm({ name: "Ranjana Chavan", email: "ranjana.chavan@pawsocial.in", topic: "General Inquiry", message: "" }); }} className="text-xs">
+                      Send Another Message
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <h2 className="font-extrabold text-lg text-slate-800 mb-1">Send Us a Direct Note</h2>
+                    <p className="text-xs text-slate-400 mb-4">We usually respond within 2 business hours across India.</p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Your Full Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={form.name}
+                          onChange={(e) => setForm({ ...form, name: e.target.value })}
+                          placeholder="e.g. Ranjana Chavan"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Email Address *</label>
+                        <input
+                          type="email"
+                          required
+                          value={form.email}
+                          onChange={(e) => setForm({ ...form, email: e.target.value })}
+                          placeholder="ranjana@example.com"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Inquiry Topic</label>
+                      <select
+                        value={form.topic}
+                        onChange={(e) => setForm({ ...form, topic: e.target.value })}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-semibold text-slate-700"
+                      >
+                        <option>General Inquiry</option>
+                        <option>Veterinary Clinic / Hospital Partnership (India)</option>
+                        <option>Animal Shelter / NGO Collaboration (India)</option>
+                        <option>Account & Pet Record Support</option>
+                        <option>Feature Request / Community Feedback</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Message *</label>
+                      <textarea
+                        required
+                        rows="4"
+                        value={form.message}
+                        onChange={(e) => setForm({ ...form, message: e.target.value })}
+                        placeholder="Tell us what's on your mind or how we can assist your furry family in India..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                      ></textarea>
+                    </div>
+
+                    <Button primary type="submit" className="w-full py-3" icon="send">
+                      Send Message to Support Desk
+                    </Button>
+                  </form>
+                )}
+              </Card>
+            </div>
+
+            {/* Direct Support Channels Column */}
+            <div className="lg:col-span-5 space-y-4">
+              <Card className="p-6">
+                <h3 className="font-extrabold text-base text-slate-800 mb-4">India Support Channels</h3>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-orange-100 text-primary flex items-center justify-center shrink-0">
+                      <i data-lucide="mail" className="w-5 h-5"></i>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-xs text-slate-800">Support Desk</h4>
+                      <p className="text-xs text-slate-500">support@pawsocial.in</p>
+                      <span className="text-[10px] text-emerald-600 font-semibold">Average reply: 30 mins</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                      <i data-lucide="phone-call" className="w-5 h-5"></i>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-xs text-slate-800">24/7 Animal Emergency Helpline</h4>
+                      <p className="text-xs text-slate-500">+91 (800) 266-PAWS (7297)</p>
+                      <span className="text-[10px] text-rose-600 font-semibold">Emergency veterinary triage (India)</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                      <i data-lucide="building" className="w-5 h-5"></i>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-xs text-slate-800">Maharashtra Office</h4>
+                      <p className="text-xs text-slate-500">PawSocial Hub, Level 5, Cyber City Tower,<br/>Bandra Kurla Complex (BKC), Mumbai, 400051</p>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Indian Shelter Alliance Card */}
+              <Card className="p-6 bg-gradient-to-br from-orange-500 to-amber-500 text-white">
+                <h4 className="font-extrabold text-base mb-1">Represent an Indian Animal NGO?</h4>
+                <p className="text-xs text-orange-100 mb-4 leading-relaxed">
+                  We provide complimentary premium tools and verified broadcast badges to registered Indian animal welfare organizations and shelters.
+                </p>
+                <button 
+                  onClick={() => alert("Indian Shelter Alliance form opened! Our advocacy team will contact you.")}
+                  className="bg-white text-primary hover:bg-orange-50 px-4 py-2 rounded-xl text-xs font-bold transition-colors shadow-sm"
+                >
+                  Join Shelter Alliance
+                </button>
+              </Card>
+            </div>
+          </div>
+
+          {/* FAQ Accordion Section */}
+          <div className="space-y-4 pt-6">
+            <div className="text-center">
+              <span className="text-xs font-bold uppercase tracking-wider text-primary">Need Quick Answers?</span>
+              <h2 className="text-2xl font-extrabold text-slate-800 mt-1">Frequently Asked Questions</h2>
+            </div>
+
+            <div className="max-w-3xl mx-auto space-y-3">
+              {faqs.map((faq, i) => {
+                const isOpen = openFaqIndex === i;
+                return (
+                  <Card key={i} className="overflow-hidden">
+                    <button
+                      onClick={() => setOpenFaqIndex(isOpen ? null : i)}
+                      className="w-full p-5 text-left flex items-center justify-between gap-4 hover:bg-slate-50/50 transition-colors"
+                    >
+                      <span className="font-bold text-sm text-slate-800">{faq.q}</span>
+                      <i 
+                        data-lucide={isOpen ? "chevron-up" : "chevron-down"} 
+                        className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'text-primary' : ''}`}
+                      ></i>
+                    </button>
+                    {isOpen && (
+                      <div className="px-5 pb-5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3 animate-fade-in font-body">
+                        {faq.a}
+                      </div>
+                    )}
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ==========================================
+    // MAIN APP CONTROLLER
+    // ==========================================
+    const App = () => {
+      // Helper to parse initial page from URL hash or pathname
+      const getPageFromUrl = () => {
+        const hash = window.location.hash.replace('#', '').toLowerCase();
+        const valid = ['home', 'pets', 'community', 'services', 'profile', 'about', 'contact'];
+        if (valid.includes(hash)) return hash;
+        const path = window.location.pathname.replace(/^\/|\/$/g, '').replace('.html', '').toLowerCase();
+        if (valid.includes(path)) return path;
+        return 'home';
+      };
+
+      const [currentPage, setCurrentPage] = useState(getPageFromUrl);
+      const [isLoggedIn, setIsLoggedIn] = useState(true);
+      const [activePet, setActivePet] = useState(initialPets[0]); // Default Sheru (Ranjana Chavan's pet)
+      
+      // Global Data State
+      const [pets, setPets] = useState(initialPets);
+      const [posts, setPosts] = useState(initialPosts);
+      const [services, setServices] = useState(initialServices);
+      const [groups, setGroups] = useState(initialGroups);
+      const [discussions, setDiscussions] = useState(initialDiscussions);
+
+      // Notification toasts
+      const [toasts, setToasts] = useState([]);
+
+      // Modals State
+      const [createPostModalOpen, setCreatePostModalOpen] = useState(false);
+      const [addPetModalOpen, setAddPetModalOpen] = useState(false);
+      const [petDetailModalPet, setPetDetailModalPet] = useState(null);
+      const [bookServiceModalService, setBookServiceModalService] = useState(null);
+      const [createGroupModalOpen, setCreateGroupModalOpen] = useState(false);
+      const [createDiscussionModalOpen, setCreateDiscussionModalOpen] = useState(false);
+      const [authModalOpen, setAuthModalOpen] = useState(false);
+      const [notificationsOpen, setNotificationsOpen] = useState(false);
+      const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
+
+      // Form state for Create Post
+      const [newPostContent, setNewPostContent] = useState("");
+      const [newPostImage, setNewPostImage] = useState("https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=800&q=80");
+      const [newPostTag, setNewPostTag] = useState("#IndiePride");
+
+      // Form state for Add Pet
+      const [newPetName, setNewPetName] = useState("");
+      const [newPetSpecies, setNewPetSpecies] = useState("Dog");
+      const [newPetBreed, setNewPetBreed] = useState("Indian Pariah (Indie)");
+      const [newPetAge, setNewPetAge] = useState("");
+      const [newPetBio, setNewPetBio] = useState("");
+      const [newPetAvatar, setNewPetAvatar] = useState("https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=400&q=80");
+
+      // Booking modal state
+      const [bookingDate, setBookingDate] = useState("2026-10-18");
+      const [bookingTime, setBookingTime] = useState("10:30 AM");
+      const [bookingNotes, setBookingNotes] = useState("");
+
+      // User profile edit state for Ranjana Chavan
+      const [userName, setUserName] = useState("Ranjana Chavan");
+      const [userBio, setUserBio] = useState("Proud mother to rescued Indie dog Sheru & Persian cat Meenu. Community stray feeder & animal rescue advocate across Pune & Mumbai. 🐾🇮🇳");
+
+      // Navigation handler with hash and scroll
+      const navigateTo = (page) => {
+        setCurrentPage(page);
+        window.location.hash = page;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      // Listen for browser back/forward and hash changes
+      useEffect(() => {
+        const handleHashChange = () => {
+          const page = getPageFromUrl();
+          setCurrentPage(page);
+        };
+        window.addEventListener('hashchange', handleHashChange);
+        window.addEventListener('popstate', handleHashChange);
+        return () => {
+          window.removeEventListener('hashchange', handleHashChange);
+          window.removeEventListener('popstate', handleHashChange);
+        };
+      }, []);
+
+      // Re-trigger Lucide icons on any visual update
+      useEffect(() => {
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+      }, [
+        currentPage, 
+        posts, 
+        pets, 
+        groups, 
+        services, 
+        isLoggedIn, 
+        petDetailModalPet, 
+        bookServiceModalService, 
+        createPostModalOpen, 
+        addPetModalOpen, 
+        authModalOpen,
+        notificationsOpen,
+        editProfileModalOpen
+      ]);
+
+      const addToast = (message, type = "success") => {
+        const id = Date.now();
+        setToasts(prev => [...prev, { id, message, type }]);
+        setTimeout(() => {
+          setToasts(prev => prev.filter(t => t.id !== id));
+        }, 4000);
+      };
+
+      const removeToast = (id) => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+      };
+
+      // Like interaction
+      const handleLike = (postId) => {
+        setPosts(prev => prev.map(post => {
+          if (post.id === postId) {
+            const nextIsLiked = !post.isLiked;
+            return {
+              ...post,
+              isLiked: nextIsLiked,
+              likes: nextIsLiked ? post.likes + 1 : post.likes - 1
+            };
+          }
+          return post;
+        }));
+      };
+
+      // Add comment interaction
+      const handleAddComment = (postId, text) => {
+        const newComment = {
+          id: Date.now(),
+          author: activePet ? `${activePet.name} & Ranjana` : "Ranjana Chavan",
+          avatar: activePet ? activePet.avatar : "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
+          text: text,
+          time: "Just now"
+        };
+        setPosts(prev => prev.map(post => {
+          if (post.id === postId) {
+            return {
+              ...post,
+              comments: [...(post.comments || []), newComment]
+            };
+          }
+          return post;
+        }));
+        addToast("Comment posted!");
+      };
+
+      // Follow / Unfollow pet
+      const handleToggleFollow = (petId) => {
+        setPets(prev => prev.map(pet => {
+          if (pet.id === petId) {
+            const nextFollow = !pet.isFollowed;
+            addToast(nextFollow ? `You are now following ${pet.name}! 🐾` : `Unfollowed ${pet.name}`);
+            return {
+              ...pet,
+              isFollowed: nextFollow,
+              followers: nextFollow ? pet.followers + 1 : pet.followers - 1
+            };
+          }
+          return pet;
+        }));
+      };
+
+      // Join / Leave group
+      const handleToggleJoinGroup = (groupId) => {
+        setGroups(prev => prev.map(g => {
+          if (g.id === groupId) {
+            const nextJoin = !g.isJoined;
+            addToast(nextJoin ? `Joined ${g.name}!` : `Left ${g.name}`);
+            return {
+              ...g,
+              isJoined: nextJoin,
+              members: nextJoin ? g.members + 1 : g.members - 1
+            };
+          }
+          return g;
+        }));
+      };
+
+      // Submit new post
+      const handleCreatePostSubmit = (e) => {
+        e.preventDefault();
+        if (!newPostContent.trim()) return;
+
+        const newPost = {
+          id: Date.now(),
+          petId: activePet ? activePet.id : 1,
+          author: activePet ? `${activePet.name} & Ranjana` : "Ranjana Chavan",
+          petName: activePet ? activePet.name : "Sheru",
+          species: activePet ? activePet.species : "Dog",
+          avatar: activePet ? activePet.avatar : "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=400&q=80",
+          owner: "Ranjana Chavan",
+          time: "Just now",
+          content: newPostContent,
+          image: newPostImage || null,
+          tag: newPostTag,
+          category: "General",
+          likes: 1,
+          isLiked: true,
+          comments: []
+        };
+
+        setPosts([newPost, ...posts]);
+        setNewPostContent("");
+        setCreatePostModalOpen(false);
+        addToast("Post shared with PawSocial India community! 🐕🇮🇳");
+      };
+
+      // Submit new pet
+      const handleAddPetSubmit = (e) => {
+        e.preventDefault();
+        if (!newPetName.trim() || !newPetBreed.trim()) return;
+
+        const newPetObj = {
+          id: Date.now(),
+          name: newPetName,
+          species: newPetSpecies,
+          breed: newPetBreed,
+          age: newPetAge || "1 yr",
+          gender: "Male",
+          weight: "15 kg",
+          owner: "Ranjana Chavan",
+          location: "Koregaon Park, Pune",
+          distance: "0.2 km away",
+          avatar: newPetAvatar,
+          coverImage: "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=800&q=80",
+          bio: newPetBio || `Friendly ${newPetBreed} ready to meet other pets in Maharashtra!`,
+          followers: 1,
+          following: 0,
+          isFollowed: true,
+          badges: ["Newly Registered", "Indian Pet"],
+          favoriteTreats: "Fresh paneer & crunchy biscuits",
+          vetClinic: "Crown Vet Multi-Speciality Clinic, Pune"
+        };
+
+        setPets([newPetObj, ...pets]);
+        setActivePet(newPetObj);
+        setAddPetModalOpen(false);
+        setNewPetName("");
+        setNewPetBreed("Indian Pariah (Indie)");
+        setNewPetAge("");
+        setNewPetBio("");
+        addToast(`Registered ${newPetObj.name}! Welcome to the pack! 🎉`);
+      };
+
+      // Confirm Booking
+      const handleConfirmBooking = (e) => {
+        e.preventDefault();
+        const bookedService = bookServiceModalService;
+        setBookServiceModalService(null);
+        addToast(`Appointment booked with ${bookedService.name} for ${bookingDate} at ${bookingTime}! 📅`);
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col bg-slate-50 font-sans selection:bg-orange-100 selection:text-orange-700">
+          
+          {/* TOAST ALERTS */}
+          <ToastContainer toasts={toasts} removeToast={removeToast} />
+
+          {/* ========================================================
+              UNIFIED HEADER (Identical & Fixed across all 7 pages)
+             ======================================================== */}
+          <header className="sticky top-0 z-40 glass-header border-b border-slate-200/80 shadow-xs">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between gap-4">
+              
+              {/* Brand Logo */}
+              <div 
+                className="flex items-center gap-3 cursor-pointer group shrink-0" 
+                onClick={() => navigateTo('home')}
+              >
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center text-white shadow-md shadow-orange-500/25 group-hover:scale-105 transition-transform">
+                  <i data-lucide="paw-print" className="w-6 h-6 stroke-[2.2]"></i>
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-extrabold text-xl text-slate-900 tracking-tight leading-none">PawSocial</span>
+                    <span className="text-xs">🇮🇳</span>
+                  </div>
+                  <span className="text-[10px] font-bold text-primary tracking-wider uppercase mt-0.5">India Pet Network</span>
+                </div>
+              </div>
+
+              {/* Navigation Menu Links */}
+              <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+                {[
+                  { id: 'home', label: 'Home', icon: 'home' },
+                  { id: 'pets', label: 'Pets', icon: 'paw-print' },
+                  { id: 'community', label: 'Community', icon: 'users' },
+                  { id: 'services', label: 'Services', icon: 'stethoscope' },
+                  { id: 'about', label: 'About', icon: 'info' },
+                  { id: 'contact', label: 'Contact', icon: 'mail' },
+                ].map(nav => (
+                  <button
+                    key={nav.id}
+                    onClick={() => navigateTo(nav.id)}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${currentPage === nav.id ? 'bg-orange-50 text-primary font-extrabold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'}`}
+                  >
+                    <i data-lucide={nav.icon} className="w-4 h-4"></i>
+                    {nav.label}
+                  </button>
+                ))}
+                {isLoggedIn && (
+                  <button
+                    onClick={() => navigateTo('profile')}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${currentPage === 'profile' ? 'bg-orange-50 text-primary font-extrabold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'}`}
+                  >
+                    <i data-lucide="user" className="w-4 h-4"></i>
+                    Profile
+                  </button>
+                )}
+              </nav>
+
+              {/* Header Right Actions */}
+              <div className="flex items-center gap-3">
+                {/* Search Bar Quick Trigger */}
+                <div 
+                  onClick={() => navigateTo('pets')}
+                  className="hidden md:flex items-center gap-2 bg-slate-100 hover:bg-slate-200/80 px-3 py-2 rounded-xl text-xs text-slate-500 cursor-pointer border border-transparent hover:border-slate-300 transition-all"
+                >
+                  <i data-lucide="search" className="w-3.5 h-3.5"></i>
+                  <span>Search Indian pets, vets, cities...</span>
+                  <kbd className="bg-white px-1.5 py-0.5 rounded text-[10px] font-semibold text-slate-400 border border-slate-200 shadow-2xs">⌘K</kbd>
+                </div>
+
+                {/* Create Post Button */}
+                <Button 
+                  primary 
+                  onClick={isLoggedIn ? () => setCreatePostModalOpen(true) : () => setAuthModalOpen(true)}
+                  icon="plus"
+                  className="text-xs py-2 px-3.5 hidden sm:inline-flex"
+                >
+                  Post
+                </Button>
+
+                {/* Notification Bell */}
+                <div className="relative">
+                  <button 
+                    onClick={() => setNotificationsOpen(!notificationsOpen)}
+                    className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors relative"
+                    title="Notifications"
+                  >
+                    <i data-lucide="bell" className="w-4 h-4"></i>
+                    <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full ring-2 ring-white"></span>
+                  </button>
+
+                  {/* Notification Dropdown Drawer */}
+                  {notificationsOpen && (
+                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-floating border border-slate-100 p-4 animate-slide-up z-50">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+                        <h4 className="font-bold text-xs text-slate-800">Pet Alerts & Updates</h4>
+                        <span className="text-[10px] text-primary font-semibold cursor-pointer" onClick={() => addToast("Marked all notifications as read")}>Mark all read</span>
+                      </div>
+                      <div className="space-y-3 text-xs">
+                        <div className="flex gap-2.5 items-start p-2 rounded-xl bg-orange-50/50">
+                          <span className="text-base">🐕</span>
+                          <div>
+                            <p className="font-semibold text-slate-800">Bruno & Rohan liked Sheru's post</p>
+                            <p className="text-[10px] text-slate-400">12 minutes ago • Bandra, Mumbai</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2.5 items-start p-2 rounded-xl hover:bg-slate-50">
+                          <span className="text-base">🩺</span>
+                          <div>
+                            <p className="font-semibold text-slate-800">Annual Rabies booster due: Meenu</p>
+                            <p className="text-[10px] text-slate-400">Crown Vet Pune • Due in 2 weeks</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2.5 items-start p-2 rounded-xl hover:bg-slate-50">
+                          <span className="text-base">🐾</span>
+                          <div>
+                            <p className="font-semibold text-slate-800">Sunday ARAI Hills Pack Walk</p>
+                            <p className="text-[10px] text-slate-400">Pune Pet Parents Meetup, 6:45 AM</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Account / Auth Toggle Profile Pill for Ranjana Chavan */}
+                {isLoggedIn ? (
+                  <div className="flex items-center gap-2 pl-1 border-l border-slate-200">
+                    <div 
+                      onClick={() => navigateTo('profile')}
+                      className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 p-1.5 pr-3 rounded-full cursor-pointer transition-all group"
+                      title="View Ranjana Chavan's Profile"
+                    >
+                      <img 
+                        src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80" 
+                        alt="Ranjana Chavan" 
+                        className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-xs group-hover:scale-105 transition-transform" 
+                      />
+                      <div className="text-left hidden md:block">
+                        <p className="text-xs font-extrabold text-slate-800 leading-none">Ranjana</p>
+                        <p className="text-[10px] text-slate-400 leading-none mt-0.5">{activePet ? activePet.name : "Sheru"} 🐾</p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setIsLoggedIn(false);
+                        addToast("Switched to Guest Mode. Public views active.");
+                      }}
+                      className="text-[11px] font-semibold text-slate-400 hover:text-slate-600 px-2 py-1"
+                      title="Switch to Guest Mode"
+                    >
+                      Log Out
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      outline 
+                      onClick={() => setAuthModalOpen(true)}
+                      className="text-xs py-2 px-3.5"
+                    >
+                      Sign In
+                    </Button>
+                    <Button 
+                      primary 
+                      onClick={() => setAuthModalOpen(true)}
+                      className="text-xs py-2 px-3.5"
+                    >
+                      Join PawSocial
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Mobile Navigation Sub-Bar */}
+            <div className="lg:hidden flex items-center justify-around border-t border-slate-100 px-2 py-2 bg-white/95">
+              {[
+                { id: 'home', label: 'Home', icon: 'home' },
+                { id: 'pets', label: 'Pets', icon: 'paw-print' },
+                { id: 'community', label: 'Community', icon: 'users' },
+                { id: 'services', label: 'Services', icon: 'stethoscope' },
+                { id: 'about', label: 'About', icon: 'info' },
+                { id: 'contact', label: 'Contact', icon: 'mail' },
+                { id: 'profile', label: 'Profile', icon: 'user' },
+              ].map(nav => (
+                <button
+                  key={nav.id}
+                  onClick={() => navigateTo(nav.id)}
+                  className={`flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg text-[10px] font-bold ${currentPage === nav.id ? 'text-primary' : 'text-slate-500'}`}
+                >
+                  <i data-lucide={nav.icon} className="w-4 h-4"></i>
+                  <span>{nav.label}</span>
+                </button>
+              ))}
+            </div>
+          </header>
+
+          {/* ========================================================
+              PAGE CONTENT ROUTER (Home, Pets, Community, Services, Profile, About, Contact)
+             ======================================================== */}
+          <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
+            {currentPage === 'home' && (
+              <HomeScreen 
+                posts={posts}
+                pets={pets}
+                onLike={handleLike}
+                onAddComment={handleAddComment}
+                onOpenCreatePost={() => setCreatePostModalOpen(true)}
+                onOpenPetDetail={(pet) => setPetDetailModalPet(pet)}
+                onToggleFollow={handleToggleFollow}
+                activePet={activePet}
+                isLoggedIn={isLoggedIn}
+                onOpenAuth={() => setAuthModalOpen(true)}
+                onNavigate={navigateTo}
+              />
+            )}
+
+            {currentPage === 'pets' && (
+              <PetsScreen 
+                pets={pets}
+                onOpenPetDetail={(pet) => setPetDetailModalPet(pet)}
+                onOpenAddPet={() => setAddPetModalOpen(true)}
+                onToggleFollow={handleToggleFollow}
+                isLoggedIn={isLoggedIn}
+                onOpenAuth={() => setAuthModalOpen(true)}
+              />
+            )}
+
+            {currentPage === 'community' && (
+              <CommunityScreen 
+                groups={groups}
+                discussions={discussions}
+                onToggleJoinGroup={handleToggleJoinGroup}
+                onOpenCreateGroup={() => setCreateGroupModalOpen(true)}
+                onOpenCreateDiscussion={() => setCreateDiscussionModalOpen(true)}
+                isLoggedIn={isLoggedIn}
+                onOpenAuth={() => setAuthModalOpen(true)}
+              />
+            )}
+
+            {currentPage === 'services' && (
+              <ServicesScreen 
+                services={services}
+                onOpenBookService={(service) => setBookServiceModalService(service)}
+              />
+            )}
+
+            {currentPage === 'profile' && (
+              <ProfileScreen 
+                pets={pets}
+                posts={posts}
+                onOpenAddPet={() => setAddPetModalOpen(true)}
+                onOpenPetDetail={(pet) => setPetDetailModalPet(pet)}
+                onOpenCreatePost={() => setCreatePostModalOpen(true)}
+                activePet={activePet}
+                setActivePet={setActivePet}
+                onOpenEditProfile={() => setEditProfileModalOpen(true)}
+              />
+            )}
+
+            {currentPage === 'about' && (
+              <AboutScreen />
+            )}
+
+            {currentPage === 'contact' && (
+              <ContactScreen 
+                onSendContactMessage={(msg) => addToast("Your message was received by our Indian pet care desk! 🙏")}
+              />
+            )}
+          </main>
+
+          {/* ========================================================
+              UNIFIED FOOTER (Identical & Fixed across all 7 screens)
+             ======================================================== */}
+          <footer className="bg-white border-t border-slate-200 mt-auto pt-16 pb-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-100">
+                
+                {/* Brand & Mission column */}
+                <div className="lg:col-span-2 space-y-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center text-white shadow-sm">
+                      <i data-lucide="paw-print" className="w-4 h-4 stroke-[2.2]"></i>
+                    </div>
+                    <span className="font-extrabold text-xl text-slate-900 tracking-tight">PawSocial India 🇮🇳</span>
+                  </div>
+                  <p className="text-slate-500 text-xs leading-relaxed max-w-sm">
+                    India’s leading social network built for pet parents, Indie lovers, and animal welfare rescuers. Connecting families with local playmates and verified animal care clinics in Pune, Mumbai, Bengaluru, and Delhi NCR.
+                  </p>
+
+                  <div className="pt-2">
+                    <p className="text-xs font-bold text-slate-700 mb-2">Subscribe to Indian Pet Wellness Digest</p>
+                    <div className="flex gap-2 max-w-sm">
+                      <input 
+                        type="email" 
+                        placeholder="Enter email address..." 
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs flex-1 outline-none focus:ring-2 focus:ring-primary/20" 
+                      />
+                      <Button primary onClick={() => addToast("Subscribed to PawSocial India Digest!")} className="text-xs py-2 px-3">
+                        Join
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 text-slate-400 pt-2">
+                    {['twitter', 'instagram', 'facebook', 'youtube'].map(icon => (
+                      <button key={icon} className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-orange-50 hover:text-primary flex items-center justify-center transition-colors">
+                        <i data-lucide={icon} className="w-4 h-4"></i>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Explore Links */}
+                <div>
+                  <h4 className="font-bold text-xs uppercase tracking-wider text-slate-800 mb-4">Explore India</h4>
+                  <ul className="space-y-2.5 text-xs text-slate-500 font-medium">
+                    <li><button onClick={() => navigateTo('home')} className="hover:text-primary transition-colors">Indian Pet Feed</button></li>
+                    <li><button onClick={() => navigateTo('pets')} className="hover:text-primary transition-colors">Desi Indie Directory</button></li>
+                    <li><button onClick={() => navigateTo('community')} className="hover:text-primary transition-colors">City Breed Clubs</button></li>
+                    <li><button onClick={() => navigateTo('services')} className="hover:text-primary transition-colors">Find Local Vets in India</button></li>
+                    <li><button onClick={() => navigateTo('services')} className="hover:text-primary transition-colors">Ayurvedic Grooming Spas</button></li>
+                  </ul>
+                </div>
+
+                {/* Company Links */}
+                <div>
+                  <h4 className="font-bold text-xs uppercase tracking-wider text-slate-800 mb-4">Company</h4>
+                  <ul className="space-y-2.5 text-xs text-slate-500 font-medium">
+                    <li><button onClick={() => navigateTo('about')} className="hover:text-primary transition-colors">About Our Mission</button></li>
+                    <li><button onClick={() => navigateTo('about')} className="hover:text-primary transition-colors">How It Works in India</button></li>
+                    <li><button onClick={() => navigateTo('about')} className="hover:text-primary transition-colors">Veterinary Advisory Council</button></li>
+                    <li><button onClick={() => navigateTo('contact')} className="hover:text-primary transition-colors">Indian NGO Alliances</button></li>
+                    <li><button onClick={() => navigateTo('contact')} className="hover:text-primary transition-colors">Press & Media</button></li>
+                  </ul>
+                </div>
+
+                {/* Support & Legal */}
+                <div>
+                  <h4 className="font-bold text-xs uppercase tracking-wider text-slate-800 mb-4">Help & Legal</h4>
+                  <ul className="space-y-2.5 text-xs text-slate-500 font-medium">
+                    <li><button onClick={() => navigateTo('contact')} className="hover:text-primary transition-colors">Frequently Asked Questions</button></li>
+                    <li><button onClick={() => navigateTo('contact')} className="hover:text-primary transition-colors">24/7 Animal Emergency Helpline</button></li>
+                    <li><button onClick={() => navigateTo('contact')} className="hover:text-primary transition-colors">Contact Indian Support</button></li>
+                    <li><button onClick={() => alert("Privacy Policy: PawSocial protects Indian pet parent location and contact data.")} className="hover:text-primary transition-colors">Privacy Policy</button></li>
+                    <li><button onClick={() => alert("Terms of Service: Pet-friendly community standards apply across India.")} className="hover:text-primary transition-colors">Terms of Service</button></li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Bottom Copyright */}
+              <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+                <p>© {new Date().getFullYear()} PawSocial India, Pvt. Ltd. Founded with love for Indian animals and their guardians.</p>
+                <div className="flex gap-4">
+                  <span className="flex items-center gap-1 text-emerald-600 font-medium">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Made in India with Care 🇮🇳
+                  </span>
+                  <span>•</span>
+                  <span>Pune & Mumbai Edition</span>
+                </div>
+              </div>
+            </div>
+          </footer>
+
+          {/* ========================================================
+              MODALS & INTERACTIVE OVERLAYS
+             ======================================================== */}
+
+          {/* MODAL 1: CREATE POST */}
+          <Modal 
+            isOpen={createPostModalOpen} 
+            onClose={() => setCreatePostModalOpen(false)}
+            title="Create Pet Post"
+          >
+            <form onSubmit={handleCreatePostSubmit} className="space-y-4">
+              <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                <img 
+                  src={activePet ? activePet.avatar : "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=150&q=80"} 
+                  alt="Pet" 
+                  className="w-10 h-10 rounded-full object-cover border border-orange-200" 
+                />
+                <div>
+                  <p className="text-xs font-bold text-slate-800">Posting as {activePet ? activePet.name : "Sheru"}</p>
+                  <p className="text-[10px] text-slate-400">{activePet ? activePet.breed : "Indian Pariah"} • Guardian: Ranjana Chavan</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">What's your pet up to today?</label>
+                <textarea
+                  rows="4"
+                  required
+                  value={newPostContent}
+                  onChange={(e) => setNewPostContent(e.target.value)}
+                  placeholder="Share a fun park sprint, monsoon care tip, favorite home-cooked treat, or vet update..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                ></textarea>
+              </div>
+
+              {/* Photo preview selector */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Select Photo to Attach</label>
+                <div className="grid grid-cols-3 gap-2 mb-2">
+                  {[
+                    "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=600&q=80"
+                  ].map((img, i) => (
+                    <img 
+                      key={i} 
+                      src={img} 
+                      onClick={() => setNewPostImage(img)}
+                      className={`h-20 w-full object-cover rounded-xl cursor-pointer border-2 transition-all ${newPostImage === img ? 'border-primary ring-2 ring-primary/20 scale-95' : 'border-transparent opacity-75 hover:opacity-100'}`} 
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Hashtag Category</label>
+                <select
+                  value={newPostTag}
+                  onChange={(e) => setNewPostTag(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 font-medium text-slate-700"
+                >
+                  <option value="#IndiePride">#IndiePride 🇮🇳</option>
+                  <option value="#MumbaiDogs">#MumbaiDogs</option>
+                  <option value="#PunePaws">#PunePaws</option>
+                  <option value="#CatsofIndia">#CatsofIndia</option>
+                  <option value="#MonsoonPetCare">#MonsoonPetCare</option>
+                  <option value="#AdoptDontShop">#AdoptDontShop</option>
+                </select>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button outline onClick={() => setCreatePostModalOpen(false)} className="flex-1 text-xs">
+                  Cancel
+                </Button>
+                <Button primary type="submit" className="flex-1 text-xs" icon="send">
+                  Publish Post
+                </Button>
+              </div>
+            </form>
+          </Modal>
+
+          {/* MODAL 2: ADD PET PROFILE */}
+          <Modal 
+            isOpen={addPetModalOpen} 
+            onClose={() => setAddPetModalOpen(false)}
+            title="Create Indian Pet Profile"
+          >
+            <form onSubmit={handleAddPetSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Pet Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newPetName}
+                    onChange={(e) => setNewPetName(e.target.value)}
+                    placeholder="e.g. Moti / Tuffy / Chikki"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Species *</label>
+                  <select
+                    value={newPetSpecies}
+                    onChange={(e) => setNewPetSpecies(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 font-medium"
+                  >
+                    <option value="Dog">Dog 🐕</option>
+                    <option value="Cat">Cat 🐈</option>
+                    <option value="Rabbit">Rabbit 🐇</option>
+                    <option value="Bird">Bird 🦜</option>
+                    <option value="Other">Other 🐾</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Breed *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newPetBreed}
+                    onChange={(e) => setNewPetBreed(e.target.value)}
+                    placeholder="e.g. Indian Pariah / Desi / Labrador"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Age</label>
+                  <input
+                    type="text"
+                    value={newPetAge}
+                    onChange={(e) => setNewPetAge(e.target.value)}
+                    placeholder="e.g. 2 yrs"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Pet Photo</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=300&q=80",
+                    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=300&q=80",
+                    "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=300&q=80",
+                    "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=300&q=80"
+                  ].map((img, i) => (
+                    <img 
+                      key={i} 
+                      src={img} 
+                      onClick={() => setNewPetAvatar(img)}
+                      className={`h-16 w-full object-cover rounded-xl cursor-pointer border-2 transition-all ${newPetAvatar === img ? 'border-primary ring-2 ring-primary/20 scale-95' : 'border-transparent opacity-75'}`} 
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Pet Bio & Quirks</label>
+                <textarea
+                  rows="3"
+                  value={newPetBio}
+                  onChange={(e) => setNewPetBio(e.target.value)}
+                  placeholder="Tell the community about temperament, favorite treats (curd, chicken, rotis), or funny habits..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+                ></textarea>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button outline onClick={() => setAddPetModalOpen(false)} className="flex-1 text-xs">
+                  Cancel
+                </Button>
+                <Button primary type="submit" className="flex-1 text-xs" icon="check">
+                  Register Pet
+                </Button>
+              </div>
+            </form>
+          </Modal>
+
+          {/* MODAL 3: PET DETAIL PASSPORT */}
+          {petDetailModalPet && (
+            <Modal 
+              isOpen={true} 
+              onClose={() => setPetDetailModalPet(null)}
+              title={`${petDetailModalPet.name}’s Digital Passport 🇮🇳`}
+              maxWidth="max-w-xl"
+            >
+              <div className="space-y-5">
+                <div className="relative h-44 rounded-2xl overflow-hidden bg-slate-200">
+                  <img src={petDetailModalPet.coverImage} alt="Cover" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 flex items-center gap-3 text-white">
+                    <img src={petDetailModalPet.avatar} alt="Avatar" className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-md bg-white" />
+                    <div>
+                      <h2 className="font-extrabold text-xl text-white">{petDetailModalPet.name}</h2>
+                      <p className="text-xs text-orange-200 font-semibold">{petDetailModalPet.breed} • {petDetailModalPet.location}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 p-3 bg-slate-50 rounded-xl text-center text-xs">
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">Age</span>
+                    <strong className="text-slate-800">{petDetailModalPet.age}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">Weight</span>
+                    <strong className="text-slate-800">{petDetailModalPet.weight}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">Followers</span>
+                    <strong className="text-slate-800">{petDetailModalPet.followers}</strong>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-bold text-slate-800 mb-1">About {petDetailModalPet.name}</h4>
+                  <p className="text-xs text-slate-600 leading-relaxed">{petDetailModalPet.bio}</p>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-bold text-slate-800 mb-1.5">Personality & Badges</h4>
+                  <div className="flex flex-wrap gap-1.5">
+                    {petDetailModalPet.badges.map((b, i) => (
+                      <Badge key={i} color="orange">{b}</Badge>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl border border-slate-100 bg-slate-50 space-y-1.5 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Guardian:</span>
+                    <span className="font-bold text-slate-800">{petDetailModalPet.owner}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Primary Hospital:</span>
+                    <span className="font-bold text-primary">{petDetailModalPet.vetClinic}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Favorite Treats:</span>
+                    <span className="font-bold text-slate-800">{petDetailModalPet.favoriteTreats}</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <Button 
+                    primary 
+                    onClick={() => {
+                      handleToggleFollow(petDetailModalPet.id);
+                    }}
+                    className="flex-1 text-xs"
+                  >
+                    {petDetailModalPet.isFollowed ? 'Following ✓' : '+ Follow Pet'}
+                  </Button>
+                  <Button 
+                    outline 
+                    onClick={() => {
+                      alert(`Message sent to ${petDetailModalPet.name}'s guardian (${petDetailModalPet.owner})!`);
+                    }}
+                    className="flex-1 text-xs"
+                    icon="message-circle"
+                  >
+                    Say Namaste 🙏
+                  </Button>
+                </div>
+              </div>
+            </Modal>
+          )}
+
+          {/* MODAL 4: BOOK SERVICE APPOINTMENT IN INDIA */}
+          {bookServiceModalService && (
+            <Modal
+              isOpen={true}
+              onClose={() => setBookServiceModalService(null)}
+              title={`Book with ${bookServiceModalService.name}`}
+              maxWidth="max-w-lg"
+            >
+              <form onSubmit={handleConfirmBooking} className="space-y-4">
+                <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-xl border border-orange-100">
+                  <div className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center shrink-0">
+                    <i data-lucide="calendar" className="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-xs text-slate-800">{bookServiceModalService.name}</h4>
+                    <p className="text-[11px] text-slate-500">{bookServiceModalService.address}</p>
+                    <p className="text-[11px] font-bold text-primary mt-0.5">Consult Fee: {bookServiceModalService.consultFee}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Which pet needs care?</label>
+                  <select className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 font-semibold text-slate-800">
+                    <option>Sheru (Indian Pariah - 2.5 yrs)</option>
+                    <option>Meenu (Persian Mix - 3 yrs)</option>
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Preferred Date</label>
+                    <input
+                      type="date"
+                      required
+                      value={bookingDate}
+                      onChange={(e) => setBookingDate(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 font-semibold text-slate-700"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Time Slot (IST)</label>
+                    <select
+                      value={bookingTime}
+                      onChange={(e) => setBookingTime(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 font-semibold text-slate-700"
+                    >
+                      <option>09:30 AM</option>
+                      <option>11:00 AM</option>
+                      <option>02:30 PM</option>
+                      <option>05:00 PM</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Special Care Notes / Symptoms</label>
+                  <textarea
+                    rows="3"
+                    value={bookingNotes}
+                    onChange={(e) => setBookingNotes(e.target.value)}
+                    placeholder="e.g. Annual Rabies + 9-in-1 vaccination booster, monsoon ear cleaning, or general wellness checkup..."
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+                  ></textarea>
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <Button outline onClick={() => setBookServiceModalService(null)} className="flex-1 text-xs">
+                    Cancel
+                  </Button>
+                  <Button primary type="submit" className="flex-1 text-xs" icon="check">
+                    Confirm Appointment (Pay at Clinic)
+                  </Button>
+                </div>
+              </form>
+            </Modal>
+          )}
+
+          {/* MODAL 5: CREATE GROUP */}
+          <Modal
+            isOpen={createGroupModalOpen}
+            onClose={() => setCreateGroupModalOpen(false)}
+            title="Create New Indian Pet Community"
+          >
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Club / Community Name</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. Pune Indie Rescues & Walkers Circle" 
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20" 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Category</label>
+                <select className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20">
+                  <option>Indie & Desi Pride</option>
+                  <option>Local Meetups</option>
+                  <option>Health & Nutrition</option>
+                  <option>Rescue & Welfare</option>
+                  <option>Small Pets</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Description & City Location</label>
+                <textarea 
+                  rows="3" 
+                  placeholder="What is this community's goal? Meetup spot (e.g. Shivaji Park, ARAI, Cubbon Park)? Friendly rules..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+                ></textarea>
+              </div>
+              <div className="flex gap-2 pt-2">
+                <Button outline onClick={() => setCreateGroupModalOpen(false)} className="flex-1 text-xs">
+                  Cancel
+                </Button>
+                <Button 
+                  primary 
+                  onClick={() => {
+                    setCreateGroupModalOpen(false);
+                    addToast("Community group created and indexed for Indian pet parents!");
+                  }} 
+                  className="flex-1 text-xs"
+                >
+                  Create Community
+                </Button>
+              </div>
+            </div>
+          </Modal>
+
+          {/* MODAL 6: CREATE DISCUSSION */}
+          <Modal
+            isOpen={createDiscussionModalOpen}
+            onClose={() => setCreateDiscussionModalOpen(false)}
+            title="Start Community Discussion"
+          >
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Discussion Topic Title</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. Best wet food brands & fresh diet ratios for Indian summer?" 
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20" 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Post Details / Question</label>
+                <textarea 
+                  rows="4" 
+                  placeholder="Share details so fellow guardians and Indian veterinarians can provide tips and advice..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+                ></textarea>
+              </div>
+              <div className="flex gap-2 pt-2">
+                <Button outline onClick={() => setCreateDiscussionModalOpen(false)} className="flex-1 text-xs">
+                  Cancel
+                </Button>
+                <Button 
+                  primary 
+                  onClick={() => {
+                    setCreateDiscussionModalOpen(false);
+                    addToast("Discussion posted to PawSocial India community!");
+                  }} 
+                  className="flex-1 text-xs"
+                >
+                  Publish Discussion
+                </Button>
+              </div>
+            </div>
+          </Modal>
+
+          {/* MODAL 7: AUTHENTICATION (LOG IN / SIGN UP) */}
+          <Modal
+            isOpen={authModalOpen}
+            onClose={() => setAuthModalOpen(false)}
+            title="Join the PawSocial India Family 🇮🇳"
+          >
+            <div className="space-y-4">
+              <div className="text-center py-2">
+                <div className="w-12 h-12 rounded-2xl bg-orange-100 text-primary flex items-center justify-center mx-auto mb-2">
+                  <i data-lucide="paw-print" className="w-6 h-6"></i>
+                </div>
+                <h3 className="font-extrabold text-base text-slate-800">Welcome to PawSocial India</h3>
+                <p className="text-xs text-slate-500">Sign in to share moments, register your Indie or companion pet, follow furry friends, and book trusted care.</p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Guardian Email</label>
+                <input 
+                  type="email" 
+                  defaultValue="ranjana.chavan@pawsocial.in" 
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20" 
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Password</label>
+                <input 
+                  type="password" 
+                  defaultValue="••••••••••••" 
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20" 
+                />
+              </div>
+
+              <div className="flex flex-col gap-2 pt-2">
+                <Button 
+                  primary 
+                  onClick={() => {
+                    setIsLoggedIn(true);
+                    setAuthModalOpen(false);
+                    addToast("Signed in as Ranjana Chavan & Sheru! 🐾🇮🇳");
+                  }} 
+                  className="w-full text-xs py-2.5"
+                >
+                  Log In as Ranjana Chavan
+                </Button>
+                <Button 
+                  outline 
+                  onClick={() => {
+                    setIsLoggedIn(true);
+                    setAuthModalOpen(false);
+                    addToast("Account created successfully! Welcome to PawSocial India!");
+                  }} 
+                  className="w-full text-xs py-2"
+                >
+                  Create New Account
+                </Button>
+              </div>
+            </div>
+          </Modal>
+
+          {/* MODAL 8: EDIT GUARDIAN PROFILE OF RANJANA CHAVAN */}
+          <Modal
+            isOpen={editProfileModalOpen}
+            onClose={() => setEditProfileModalOpen(false)}
+            title="Edit Guardian Profile"
+          >
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              setEditProfileModalOpen(false);
+              addToast("Guardian profile updated successfully! ✨");
+            }} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Guardian Name</label>
+                <input
+                  type="text"
+                  required
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 font-semibold text-slate-800"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Bio & Animal Rescue Involvements</label>
+                <textarea
+                  rows="3"
+                  value={userBio}
+                  onChange={(e) => setUserBio(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+                ></textarea>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button outline onClick={() => setEditProfileModalOpen(false)} className="flex-1 text-xs">
+                  Cancel
+                </Button>
+                <Button primary type="submit" className="flex-1 text-xs" icon="check">
+                  Save Changes
+                </Button>
+              </div>
+            </form>
+          </Modal>
+
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
